@@ -16,12 +16,12 @@ var Stage = Quark.Stage = function(props)
 	this.stageX = 0;
 	this.stageY = 0;
 	this.paused = false;
-	  
+
 	this._eventTarget = null;
 	
 	props = props || {};
 	Stage.superClass.constructor.call(this, props);
-	this.id = props.id || Quark.UIDUtil.createUID("Stage");	
+	this.id = props.id || Quark.UIDUtil.createUID("Stage");
 	if(this.context == null) throw "Quark.Stage Error: context is required.";
 	
 	this.updatePosition();
@@ -42,7 +42,7 @@ Stage.prototype.step = function(timeInfo)
  * 更新舞台Stage上所有显示对象的数据。
  */
 Stage.prototype._update = function(timeInfo)
-{	
+{
 	//Stage作为根容器，先更新所有子对象，再调用update方法。
 	var copy = this.children.slice(0);
 	for(var i = 0, len = copy.length; i < len; i++)

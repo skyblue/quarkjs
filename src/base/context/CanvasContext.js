@@ -20,6 +20,7 @@ Quark.inherit(CanvasContext, Quark.Context);
 CanvasContext.prototype.startDraw = function()
 {
 	this.context.save();
+    // this.context.globalAlpha= 1;
 };
 
 /**
@@ -80,7 +81,13 @@ CanvasContext.prototype.transform = function(target)
 CanvasContext.prototype.clear = function(x, y, width, height)
 {
 	this.context.clearRect(x, y, width, height);
-	//this.canvas.width = this.canvas.width;
+	// this.canvas.width = this.canvas.width;
+
+	//实现拖影效果
+	// var ctx = this.context;
+	// ctx.globalAlpha= 0.2;
+ //    ctx.fillStyle = 'rgb(255,255,255)';
+	// ctx.fillRect(x, y, width, height);
 };
 
 })();
