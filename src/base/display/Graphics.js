@@ -8,20 +8,21 @@
  * @class The Graphics class contains a set of methods that you can use to create a vector shape.
  */ 
 var Graphics = Quark.Graphics = function(props)
-{
-	props = props || {};
-	Graphics.superClass.constructor.call(this, props);
-	this.id = Quark.UIDUtil.createUID("Graphics");
-	
+{	
 	this.lineWidth = 1;
 	this.strokeStyle = "0";
 	this.lineAlpha = 1;
 	this.lineCap = null; //"butt", "round", "square"
 	this.lineJoin = null; //"miter", "round", "bevel"
 	this.miterLimit = 10;
+	this.hasStroke = false;
 	
 	this.fillStyle = "0";
 	this.fillAlpha = 1;
+	
+	props = props || {};
+	Graphics.superClass.constructor.call(this, props);
+	this.id = Quark.UIDUtil.createUID("Graphics");
 	
 	this._actions = [];
 	this._cache = null;
@@ -39,6 +40,7 @@ Graphics.prototype.lineStyle = function(thickness, lineColor, alpha, lineCap, li
 	if(lineCap != undefined) this._addAction(["lineCap", (this.lineCap = lineCap)]);
 	if(lineJoin != undefined) this._addAction(["lineJoin", (this.lineJoin = lineJoin)]);
 	if(miterLimit != undefined) this._addAction(["miterLimit", (this.miterLimit = miterLimit)]);
+	this.hasStroke = true;
 	return this;
 };
 
@@ -57,7 +59,7 @@ Graphics.prototype.beginFill = function(fill, alpha)
  */
 Graphics.prototype.endFill = function()
 {
-	this._addAction(["stroke"]);
+	if(this.hasStroke) this._addAction(["stroke"]);
 	this._addAction(["fill"]);
 	return this;
 };
@@ -274,6 +276,7 @@ Graphics.prototype.clear = function()
 	this.lineCap = null;
 	this.lineJoin = null;
 	this.miterLimit = 10;
+	this.hasStroke = false;
 	
 	this.fillStyle = "0";
 	this.fillAlpha = 1;

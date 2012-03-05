@@ -1052,6 +1052,38 @@ function drawObjectRect(obj, ctx)
 	}
 };
 
+/**
+ * 把DisplayObject对象转换成dataURL格式的位图。
+ */
+Quark.displayObjectToImage = function(obj, type)
+{
+	if(this._helpStage == null)
+	{
+		this._helpStage = new Q.Stage({context:new Q.CanvasContext({canvas:Q.createDOM("canvas")})});		
+	}
+	
+	var w = obj.width, h = obj.height, x = obj.x, y = obj.y;	
+	var context = this._helpStage.context, canvas = context.canvas;
+	context.clear(0, 0, canvas.width, canvas.height);
+	canvas.width = this._helpStage.width = w;
+	canvas.height = this._helpStage.height = h;
+	
+	obj.x = 0;
+	obj.y = 0;
+	context.startDraw();
+	context.transform(obj);
+	obj.render(context);
+	context.endDraw();
+	obj.x = x;
+	obj.y = y;
+	
+	var img = new Image();
+	img.width = w;
+	img.height = h;
+	img.src = canvas.toDataURL(type || "image/png");
+	return img;
+};
+
 })();
 
 
@@ -2280,6 +2312,14 @@ DisplayObject.prototype.getStage = function()
 };
 
 /**
+ * 把DisplayObject对象转换成dataURL格式的位图。
+ */
+DisplayObject.prototype.toImage = function(type)
+{	
+	return Quark.displayObjectToImage(this, type);
+};
+
+/**
  * 返回DisplayObject对象的全路径的字符串表示形式，方便debug。如Stage1.Container2.Bitmap3。
  */
 DisplayObject.prototype.toString = function()
@@ -2489,9 +2529,10 @@ DisplayObjectContainer.prototype.sortChildren = function(keyOrFunction)
 	var f = keyOrFunction;
 	if(typeof(f) == "string")
 	{
+		var key = f;
 		f = function(a, b)
 		{
-			return b[f] - a[f];
+			return b[key] - a[key];
 		};
 	}
 	this.children.sort(f);
@@ -3115,20 +3156,21 @@ Button.prototype.setDrawable = function(drawable)
  * @class The Graphics class contains a set of methods that you can use to create a vector shape.
  */ 
 var Graphics = Quark.Graphics = function(props)
-{
-	props = props || {};
-	Graphics.superClass.constructor.call(this, props);
-	this.id = Quark.UIDUtil.createUID("Graphics");
-	
+{	
 	this.lineWidth = 1;
 	this.strokeStyle = "0";
 	this.lineAlpha = 1;
 	this.lineCap = null; //"butt", "round", "square"
 	this.lineJoin = null; //"miter", "round", "bevel"
 	this.miterLimit = 10;
+	this.hasStroke = false;
 	
 	this.fillStyle = "0";
 	this.fillAlpha = 1;
+	
+	props = props || {};
+	Graphics.superClass.constructor.call(this, props);
+	this.id = Quark.UIDUtil.createUID("Graphics");
 	
 	this._actions = [];
 	this._cache = null;
@@ -3146,6 +3188,7 @@ Graphics.prototype.lineStyle = function(thickness, lineColor, alpha, lineCap, li
 	if(lineCap != undefined) this._addAction(["lineCap", (this.lineCap = lineCap)]);
 	if(lineJoin != undefined) this._addAction(["lineJoin", (this.lineJoin = lineJoin)]);
 	if(miterLimit != undefined) this._addAction(["miterLimit", (this.miterLimit = miterLimit)]);
+	this.hasStroke = true;
 	return this;
 };
 
@@ -3164,7 +3207,7 @@ Graphics.prototype.beginFill = function(fill, alpha)
  */
 Graphics.prototype.endFill = function()
 {
-	this._addAction(["stroke"]);
+	if(this.hasStroke) this._addAction(["stroke"]);
 	this._addAction(["fill"]);
 	return this;
 };
@@ -3381,6 +3424,7 @@ Graphics.prototype.clear = function()
 	this.lineCap = null;
 	this.lineJoin = null;
 	this.miterLimit = 10;
+	this.hasStroke = false;
 	
 	this.fillStyle = "0";
 	this.fillAlpha = 1;
