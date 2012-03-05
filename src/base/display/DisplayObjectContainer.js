@@ -7,7 +7,6 @@
      * @class DisplayObjectContainer类继承自DisplayObject，是显示列表中显示对象容器的基类。每个DisplayObjectContainer对象都有自己的子级列表children，用于组织对象的Z轴顺序。注意：DisplayObjectContainer对象的宽高默认为0，在autoSize=false的情况下，需要手动设置宽高。
      * @property eventChildren 指示DisplayObjectContainer的子元素是否接受交互事件，如mousedown，touchstart等。默认为true。
      * @property autoSize 指示DisplayObjectContainer是否随子元素自动设置大小。默认为false。
-     * @property drawOnce 指示DisplayObjectContainer是否每次渲染children子节点。默认为false。
      */
     var DisplayObjectContainer = Quark.DisplayObjectContainer = function(props) {
             this.eventChildren = true;
@@ -25,8 +24,6 @@
                     this.addChild(props.children[i]);
                 }
             }
-            props.drawOnce = props.drawOnce || false;
-            this.drawed = false;
         };
     Quark.inherit(DisplayObjectContainer, Quark.DisplayObject);
 
@@ -202,7 +199,6 @@
     DisplayObjectContainer.prototype._update = function(timeInfo) {
         //先更新容器本身的数据，再更新子元素的数据
         if (this.update != null) this.update(timeInfo);
-        if (this.drawOnce && this.drawed) return;
 
         var copy = this.children.slice(0);
         for (var i = 0, len = copy.length; i < len; i++) {
@@ -217,13 +213,11 @@
      */
     DisplayObjectContainer.prototype.render = function(context) {
         DisplayObjectContainer.superClass.render.call(this, context);
-        if (this.drawOnce && this.drawed) return;
 
         for (var i = 0, len = this.children.length; i < len; i++) {
             var child = this.children[i];
             child._render(context);
         }
-        this.drawed = true;
     };
 
     /**

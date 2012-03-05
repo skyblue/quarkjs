@@ -123,7 +123,6 @@ function detectBrowser(ns)
 	ns.supportTouch = "ontouchstart" in win;
 	ns.supportCanvas = document.createElement("canvas").getContext != null;
 	ns.cssPrefix = ns.isWebKit ? "webkit" : ns.isFirefox ? "Moz" : ns.isOpera ? "O" : ns.isIE ? "ms" : "";
-	ns.isRetina =  !!(window.devicePixelRatio >= 2);
 };
 
 detectBrowser(Quark);

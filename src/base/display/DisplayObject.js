@@ -23,7 +23,7 @@
  * @property useHandCursor 指示DisplayObject对象是否支持手型的鼠标光标。默认为false。
  * @property polyArea 指示DisplayObject对象的多边形碰撞区域。默认为null，即使用对象的外包围矩形。
  * @property parent DisplayObject对象的父容器。只读属性。
- */	
+ */
 var DisplayObject = Quark.DisplayObject = function(props)
 {
 	this.id = Quark.UIDUtil.createUID("DisplayObject");
@@ -46,7 +46,7 @@ var DisplayObject = Quark.DisplayObject = function(props)
 	this.polyArea = null;
 
 	this.drawable = null;
-	this.parent = null;	
+	this.parent = null;
 	this.context = null;
 	
 	this._depth = 0;
@@ -61,7 +61,7 @@ var DisplayObject = Quark.DisplayObject = function(props)
  * 设置可绘制对象，默认是一个Image对象，可通过覆盖此方法进行DOM绘制。
  */
 DisplayObject.prototype.setDrawable = function(drawable)
-{ 
+{
 	if(this.drawable == null)
 	{
 		this.drawable = new Quark.Drawable(drawable);
@@ -84,7 +84,7 @@ DisplayObject.prototype.getDrawable = function(context)
  * 对象数据更新接口，仅供框架内部或组件开发者使用。用户通常应该重写update方法。
  */
 DisplayObject.prototype._update = function(timeInfo)
-{ 
+{
 	this.update(timeInfo);
 };
 
@@ -99,7 +99,7 @@ DisplayObject.prototype.update = function(timeInfo){ };
 DisplayObject.prototype._render = function(context)
 {
 	var ctx = this.context || context;
-	if(!this.visible || this.alpha <= 0) 
+	if(!this.visible || this.alpha <= 0)
 	{
 		if(ctx.hide != null) ctx.hide(this);
 		this.saveState(["visible", "alpha"]);
@@ -124,8 +124,8 @@ DisplayObject.prototype.render = function(context)
 /**
  * DisplayObject对象的系统事件处理器，仅供框架内部或组件开发者使用。用户通常应该设置onEvent回调。
  */
-DisplayObject.prototype._onEvent = function(e) 
-{ 	
+DisplayObject.prototype._onEvent = function(e)
+{
 	if(this.onEvent != null) this.onEvent(e);
 };
 

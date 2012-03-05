@@ -1,3 +1,16 @@
+(function(factory) {
+
+  if (typeof define === 'function') {
+    define(factory);
+  }
+  else if (typeof exports !== 'undefined') {
+    factory(require, exports);
+  }
+  else {
+    factory();
+  }
+
+})(function(require, exports) {
 
 (function(win){
 
@@ -3684,3 +3697,4 @@ DOMContext.prototype.remove = function(target)
 })();
 
 
+});

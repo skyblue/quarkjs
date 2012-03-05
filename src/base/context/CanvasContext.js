@@ -41,7 +41,7 @@ CanvasContext.prototype.draw = function(target)
  */
 CanvasContext.prototype.endDraw = function()
 {
-	this.context.restore();	
+	this.context.restore();
 };
 
 /**
@@ -51,8 +51,7 @@ CanvasContext.prototype.transform = function(target)
 {
 	var ctx = this.context;
 	
-	if(target instanceof Q.Stage)
-	{
+	if(target instanceof Q.Stage){
 		//Use style for stage scaling
 		if(target._scaleX != target.scaleX)
 		{
@@ -64,8 +63,7 @@ CanvasContext.prototype.transform = function(target)
 			target._scaleY = target.scaleY;
 			this.canvas.style.height = target._scaleY * target.height + "px";
 		}
-	}else
-	{
+	}else{
 		if(target.x != 0 || target.y != 0) ctx.translate(target.x, target.y);
 		if(target.rotation%360 != 0) ctx.rotate(target.rotation%360*Quark.DEG_TO_RAD);
 		if(target.scaleX != 1 || target.scaleY != 1) ctx.scale(target.scaleX, target.scaleY);
