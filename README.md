@@ -1,4 +1,4 @@
-QuarkJS - A HTML5 Game Framework
+QuarkJS - A HTML5 Game Framework(skyblue-forked)
 ================================
 
 QuarkJS is a HTML5 game framework. The aim is to provide a easy way to create game with HTML5.
