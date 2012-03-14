@@ -2033,6 +2033,7 @@ function isDrawable(elem)
  * @property transformEnabled 指示DisplayObject对象是否执行变换。默认为false。
  * @property useHandCursor 指示DisplayObject对象是否支持手型的鼠标光标。默认为false。
  * @property polyArea 指示DisplayObject对象的多边形碰撞区域。默认为null，即使用对象的外包围矩形。
+ * @property mask 指示DisplayObject对象的遮罩对象。当上下文为DOMContext时暂时只支持webkit内核浏览器。默认为null。
  * @property parent DisplayObject对象的父容器。只读属性。
  */	
 var DisplayObject = Quark.DisplayObject = function(props)
@@ -2055,6 +2056,7 @@ var DisplayObject = Quark.DisplayObject = function(props)
 	this.transformEnabled = true;
 	this.useHandCursor = false;
 	this.polyArea = null;
+	this.mask = null;
 
 	this.drawable = null;
 	this.parent = null;	
@@ -2118,7 +2120,7 @@ DisplayObject.prototype._render = function(context)
 	}
 	
 	ctx.startDraw();
-	ctx.transform(this);
+	ctx.transform(this);	
 	this.render(ctx);
 	ctx.endDraw();
 	this.saveState();
@@ -2421,7 +2423,7 @@ DisplayObjectContainer.prototype.removeChildAt = function(index)
 	if (child != null) 
 	{
 		var stage = this.getStage();
-		stage.context.remove(child);
+		if(stage != null) stage.context.remove(child);
 		child.parent = null;
 	}
 	this.children.splice(index, 1);
@@ -3165,7 +3167,9 @@ var Graphics = Quark.Graphics = function(props)
 	this.lineCap = null; //"butt", "round", "square"
 	this.lineJoin = null; //"miter", "round", "bevel"
 	this.miterLimit = 10;
+	
 	this.hasStroke = false;
+	this.hasFill = false;
 	
 	this.fillStyle = "0";
 	this.fillAlpha = 1;
@@ -3201,6 +3205,7 @@ Graphics.prototype.beginFill = function(fill, alpha)
 {
 	this._addAction(["fillStyle", (this.fillStyle = fill)]);
 	this._addAction(["fillAlpha", (this.fillAlpha = alpha || 1)]);
+	this.hasFill = true;
 	return this;
 };
 
@@ -3210,7 +3215,7 @@ Graphics.prototype.beginFill = function(fill, alpha)
 Graphics.prototype.endFill = function()
 {
 	if(this.hasStroke) this._addAction(["stroke"]);
-	this._addAction(["fill"]);
+	if(this.hasFill) this._addAction(["fill"]);
 	return this;
 };
 
@@ -3327,6 +3332,44 @@ Graphics.prototype.drawEllipse = function(x, y, width, height)
 };
 
 /**
+ * Draws a path from SVG path data. 
+ * For example: 
+ * var path = "M250 150 L150 350 L350 350 Z";
+ * var shape = new Quark.Graphics({width:500, height:500});
+ * shape.drawSVGPath(path).beginFill("#0ff").endFill();
+ */
+Graphics.prototype.drawSVGPath = function(pathData)
+{
+	var path = pathData.split(/,| (?=[a-zA-Z])/);
+	
+	this._addAction(["beginPath"]);
+	for(var i = 0, len = path.length; i < len; i++)
+	{
+		var str = path[i], cmd = str[0].toUpperCase(), p = str.substring(1).split(/,| /);
+		if(p[0].length == 0) p.shift();
+
+		switch(cmd)
+		{
+			case "M":
+				this._addAction(["moveTo", p[0], p[1]]);
+				break;
+			case "L":
+				this._addAction(["lineTo", p[0], p[1]]);
+				break;
+			case "C":
+				this._addAction(["bezierCurveTo", p[0], p[1], p[2], p[3], p[4], p[5]]);
+				break;
+			case "Z":
+				this._addAction(["closePath"]);
+				break;
+			default:
+				break;
+		}
+	}
+	return this;
+};
+
+/**
  * Override method.
  * @private
  */
@@ -3418,7 +3461,7 @@ Graphics.prototype.toImage = function(type)
 Graphics.prototype.clear = function()
 {
 	this._actions.length = 0;
-	this._cache = 0;
+	this._cache = null;
 	
 	this.lineWidth = 1;
 	this.strokeStyle = "0";
@@ -3531,6 +3574,13 @@ CanvasContext.prototype.startDraw = function()
  */
 CanvasContext.prototype.draw = function(target)
 {
+	//draw mask first
+	if(target.mask != null)
+	{		
+		target.mask._render(this);
+		this.context.globalCompositeOperation = 'source-in';
+	}
+	
 	var img = target.getDrawable(this);
 	if(img != null)
 	{
@@ -3697,6 +3747,12 @@ DOMContext.prototype.transform = function(target)
 	if(!style.zIndex || target.propChanged("_depth"))
 	{
 		style.zIndex = target._depth;
+	}
+	if(target.mask != null)
+	{
+		style[Q.cssPrefix + "MaskImage"] = target.mask.getDrawable(this).style.backgroundImage;
+		style[Q.cssPrefix + "MaskRepeat"] = "no-repeat";
+		style[Q.cssPrefix + "MaskPosition"] = target.mask.x + "px " + target.mask.y + "px";
 	}
 };
 
