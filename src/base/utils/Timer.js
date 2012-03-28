@@ -1,5 +1,22 @@
 
 (function(){
+window.requestAnimFrame = (function(){
+  return  window.requestAnimationFrame       ||
+          window.webkitRequestAnimationFrame ||
+          window.mozRequestAnimationFrame    ||
+          window.oRequestAnimationFrame      ||
+          window.msRequestAnimationFrame     ||
+          null;
+})();
+
+window.cancelRequestAnimFrame = ( function() {
+    return window.cancelAnimationFrame              ||
+        window.webkitCancelRequestAnimationFrame    ||
+        window.mozCancelRequestAnimationFrame       ||
+        window.oCancelRequestAnimationFrame         ||
+        window.msCancelRequestAnimationFrame        ||
+        clearTimeout;
+})();
 
 /**
  * Constructor.
@@ -8,14 +25,14 @@
  * @param interval 计时器的时间间隔。以毫秒为单位。
  */
 var Timer = Quark.Timer = function(interval)
-{	
-	this.interval = interval || 50;
-	this.paused = false;	
-	this.info = {lastTime:0, currentTime:0, deltaTime:0, realDeltaTime:0};
+{
+    this.interval = interval || 50;
+    this.paused = false;
+    this.info = {lastTime:0, currentTime:0, deltaTime:0, realDeltaTime:0};
 
-	this._startTime = 0;
-	this._intervalID = null;
-	this._listeners = [];
+    this._startTime = 0;
+    this._intervalID = null;
+    this._listeners = [];
 };
 
 /**
@@ -23,11 +40,17 @@ var Timer = Quark.Timer = function(interval)
  */
 Timer.prototype.start = function()
 {
-	if(this._intervalID != null) return;
-	this._startTime = this.info.lastTime = this.info.currentTime = Date.now();
-	var me = this;
-	var run = function(){me._intervalID = setTimeout(run, me.interval);me._run();};
-	run();
+    if(this._intervalID !== null) return;
+    this._startTime = this.info.lastTime = this.info.currentTime = Date.now();
+    var me = this;
+    // var run = function(){me._intervalID = setTimeout(run, me.interval);me._run();};
+
+    window.requestAnimFrame = window.requestAnimFrame ||
+                                function(/* function */ callback, /* DOMElement */ element){
+                                    window.setTimeout(callback, me.interval);
+                                };
+    var run = function(){me._intervalID = window.requestAnimFrame(run);me._run();};
+    run();
 };
 
 /**
@@ -35,9 +58,10 @@ Timer.prototype.start = function()
  */
 Timer.prototype.stop = function()
 {
-	clearTimeout(this._intervalID);
-	this._intervalID = null;
-	this._startTime = 0;
+    // clearTimeout(this._intervalID);
+    cancelRequestAnimFrame(this._intervalID);
+    this._intervalID = null;
+    this._startTime = 0;
 };
 
 /**
@@ -45,7 +69,7 @@ Timer.prototype.stop = function()
  */
 Timer.prototype.pause = function()
 {
-	this.paused = true;
+    this.paused = true;
 };
 
 /**
@@ -53,7 +77,7 @@ Timer.prototype.pause = function()
  */
 Timer.prototype.resume = function()
 {
-	this.paused = false;
+    this.paused = false;
 };
 
 /**
@@ -62,29 +86,29 @@ Timer.prototype.resume = function()
  */
 Timer.prototype._run = function()
 {
-	if(this.paused) return;
-	
-	var info = this.info;
-	var time = info.currentTime = Date.now();
-	info.deltaTime = info.realDeltaTime = time - info.lastTime;
-	
-	for(var i = 0, len = this._listeners.length, obj, runTime; i < len; i++)
-	{
-		obj = this._listeners[i];
-		runTime = obj.__runTime || 0;
-		if(runTime == 0)
-		{
-			obj.step(this.info);
-		}else if(time > runTime)
-		{
-			obj.step(this.info);
-			this._listeners.splice(i, 1);
-			i--;
-			len--;
-		}
-	}
-	
-	info.lastTime = time;
+    if(this.paused) return;
+    
+    var info = this.info;
+    var time = info.currentTime = Date.now();
+    info.deltaTime = info.realDeltaTime = time - info.lastTime;
+    
+    for(var i = 0, len = this._listeners.length, obj, runTime; i < len; i++)
+    {
+        obj = this._listeners[i];
+        runTime = obj.__runTime || 0;
+        if(runTime == 0)
+        {
+            obj.step(this.info);
+        }else if(time > runTime)
+        {
+            obj.step(this.info);
+            this._listeners.splice(i, 1);
+            i--;
+            len--;
+        }
+    }
+    
+    info.lastTime = time;
 };
 
 /**
@@ -94,8 +118,8 @@ Timer.prototype._run = function()
  */
 Timer.prototype.delay = function(callback, time)
 {
-	var obj = {step:callback, __runTime:Date.now() + time};
-	this.addListener(obj);
+    var obj = {step:callback, __runTime:Date.now() + time};
+    this.addListener(obj);
 };
 
 /**
@@ -104,8 +128,8 @@ Timer.prototype.delay = function(callback, time)
  **/
 Timer.prototype.addListener = function(obj)
 {
-	if(obj == null || typeof(obj.step) != "function") throw "Timer Error: The listener object must implement a step() method!";
-	this._listeners.push(obj);
+    if(obj == null || typeof(obj.step) != "function") throw "Timer Error: The listener object must implement a step() method!";
+    this._listeners.push(obj);
 };
 
 /**
@@ -113,11 +137,11 @@ Timer.prototype.addListener = function(obj)
  */
 Timer.prototype.removeListener = function(obj)
 {
-	var index = this._listeners.indexOf(obj);
-	if(index > -1)
-	{
-		this._listeners.splice(index, 1);
-	}
+    var index = this._listeners.indexOf(obj);
+    if(index > -1)
+    {
+        this._listeners.splice(index, 1);
+    }
 };
 
 })();

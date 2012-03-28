@@ -578,7 +578,6 @@ var p = Tween.prototype;
 	 * @protected
 	 **/
 	p._addStep = function(o) {
-		console.log(o);
 		if (o.d > 0) {
 			this._steps.push(o);
 			o.t = this.duration;

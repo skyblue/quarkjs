@@ -20,7 +20,7 @@ var Bitmap = Quark.Bitmap = function(props)
 	Bitmap.superClass.constructor.call(this, props);
 	this.id = props.id || Quark.UIDUtil.createUID("Bitmap");
 	
-	this.setRect(props.rect || [0, 0, this.image.width, this.image.height]);	
+	this.image && this.setRect(props.rect || [0, 0, this.image.width, this.image.height]);
 	this.setDrawable(this.image);
 	this._stateList.push("rectX", "rectY", "rectWidth", "rectHeight");
 };
