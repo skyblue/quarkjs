@@ -24,7 +24,7 @@
  * @property polyArea 指示DisplayObject对象的多边形碰撞区域。默认为null，即使用对象的外包围矩形。
  * @property mask 指示DisplayObject对象的遮罩对象。当上下文为DOMContext时暂时只支持webkit内核浏览器。默认为null。
  * @property parent DisplayObject对象的父容器。只读属性。
- */
+ */	
 var DisplayObject = Quark.DisplayObject = function(props)
 {
 	this.id = Quark.UIDUtil.createUID("DisplayObject");
@@ -48,13 +48,13 @@ var DisplayObject = Quark.DisplayObject = function(props)
 	this.mask = null;
 
 	this.drawable = null;
-	this.parent = null;
+	this.parent = null;	
 	this.context = null;
 	
 	this._depth = 0;
 	this._lastState = {};
 	this._stateList = ["x", "y", "regX", "regY", "width", "height", "alpha", "scaleX", "scaleY", "rotation", "visible", "_depth"];
-	
+
 	Quark.merge(this, props, true);
 	if(props.mixin) Quark.merge(this, props.mixin, false);
 };
@@ -63,7 +63,7 @@ var DisplayObject = Quark.DisplayObject = function(props)
  * 设置可绘制对象，默认是一个Image对象，可通过覆盖此方法进行DOM绘制。
  */
 DisplayObject.prototype.setDrawable = function(drawable)
-{
+{ 
 	if(this.drawable == null)
 	{
 		this.drawable = new Quark.Drawable(drawable);
@@ -79,14 +79,14 @@ DisplayObject.prototype.setDrawable = function(drawable)
 DisplayObject.prototype.getDrawable = function(context)
 {
 	//context = context || this.context || this.getStage().context;
-	return this.drawable && this.drawable.get(this, context);
+	return this._cache || this.drawable && this.drawable.get(this, context);
 };
 
 /**
  * 对象数据更新接口，仅供框架内部或组件开发者使用。用户通常应该重写update方法。
  */
 DisplayObject.prototype._update = function(timeInfo)
-{
+{ 
 	this.update(timeInfo);
 };
 
@@ -101,7 +101,7 @@ DisplayObject.prototype.update = function(timeInfo){ return true; };
 DisplayObject.prototype._render = function(context)
 {
 	var ctx = this.context || context;
-	if(!this.visible || this.alpha <= 0)
+	if(!this.visible || this.alpha <= 0) 
 	{
 		if(ctx.hide != null) ctx.hide(this);
 		this.saveState(["visible", "alpha"]);
@@ -109,7 +109,7 @@ DisplayObject.prototype._render = function(context)
 	}
 	
 	ctx.startDraw();
-	ctx.transform(this);	
+	ctx.transform(this);
 	this.render(ctx);
 	ctx.endDraw();
 	this.saveState();
@@ -124,17 +124,13 @@ DisplayObject.prototype.render = function(context)
 };
 
 /**
- * DisplayObject对象的系统事件处理器，仅供框架内部或组件开发者使用。用户通常应该设置onEvent回调。
+ * DisplayObject对象的系统事件处理器，仅供框架内部或组件开发者使用。用户通常应该设置相应的回调函数，如onmousedown、onmousemove、onmouseup、onmouseout等。
  */
-DisplayObject.prototype._onEvent = function(e)
+DisplayObject.prototype._onEvent = function(e) 
 {
-	if(this.onEvent != null) this.onEvent(e);
+	var handler = "on" + e.type;
+	if(this[handler] != null) this[handler](e);
 };
-
-/**
- * DisplayObject对象的系统事件处理器，可通过设置onEvent回调来处理事件。
- */
-DisplayObject.prototype.onEvent = null;
 
 /**
  * 保存DisplayObject对象的状态列表中的各种属性状态。
@@ -303,11 +299,31 @@ DisplayObject.prototype.getStage = function()
 };
 
 /**
+ * Draws the display object into a new canvas for caching use. This can provide faster rendering for complex object that doesn't change frequently.
+ * 把DisplayObject对象缓存到一个新的canvas，对于包含复杂内容且不经常改变的对象使用缓存，可以提高渲染速度。
+ * @param {Boolean} toImage Indicates whether convert to an image in dataURL format.
+ * @param {String} type The converting image mime type when 'toImage' sets to true, 'image/png' is default.
+ */
+Quark.DisplayObject.prototype.cache  = function(toImage, type)
+{
+	return this._cache = Quark.cacheObject(this, toImage, type);
+};
+
+/**
+ * Clears the cache.
+ * 清除缓存。
+ */
+Quark.DisplayObject.prototype.uncache = function()
+{
+	this._cache = null;
+};
+
+/**
  * 把DisplayObject对象转换成dataURL格式的位图。
  */
-DisplayObject.prototype.toImage = function(type)
+Quark.DisplayObject.prototype.toImage = function(type)
 {	
-	return Quark.displayObjectToImage(this, type);
+	return Quark.cacheObject(this, true, type);
 };
 
 /**
@@ -316,7 +332,6 @@ DisplayObject.prototype.toImage = function(type)
 DisplayObject.prototype.toString = function()
 {
 	return Quark.UIDUtil.displayObjectToString(this);
-	//return this.id || this.name;
 };
 
 })();
