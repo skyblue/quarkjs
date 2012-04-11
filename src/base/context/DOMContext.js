@@ -50,12 +50,16 @@ DOMContext.prototype.draw = function(target)
 	{
 		var parent = target.parent;
 		var targetDOM = target.getDrawable(this);
-		if(parent == null && targetDOM.parentNode == null)
-		{
+		if(parent == null && targetDOM.parentNode == null){
 			this.canvas.appendChild(targetDOM);
-		}else
-		{
+		}else{
 			var parentDOM = parent.getDrawable(this);
+			if(parentDOM.parentNode == null){
+				if(parent instanceof Quark.Stage){
+					parentDOM.style.pointerEvents = parentDOM.style.pointerEvents || "none";
+				}
+				this.canvas.appendChild(parentDOM);
+			}
 			if(targetDOM.parentNode != parentDOM) parentDOM.appendChild(targetDOM);
 		}
 		target._addedToDOM = true;

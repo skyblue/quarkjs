@@ -48,7 +48,7 @@ var DisplayObject = Quark.DisplayObject = function(props)
 	this.mask = null;
 
 	this.drawable = null;
-	this.parent = null;	
+	this.parent = null;
 	this.context = null;
 	
 	this._depth = 0;
@@ -100,6 +100,7 @@ DisplayObject.prototype.update = function(timeInfo){ return true; };
  */
 DisplayObject.prototype._render = function(context)
 {
+	// this.context = this.context || context;
 	var ctx = this.context || context;
 	if(!this.visible || this.alpha <= 0) 
 	{

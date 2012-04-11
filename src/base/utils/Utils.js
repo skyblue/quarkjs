@@ -5,10 +5,10 @@
  * Translates url parameters into a key-value object.
  * 获取并对象化url参数。
  */
-Quark.getUrlParams = function()
+Quark.getUrlParams = function(url)
 {
 	var params = {};
-	var url = window.location.href;
+	url = url || window.location.href;
 	var idx = url.indexOf("?");
 	if(idx > 0)
 	{
