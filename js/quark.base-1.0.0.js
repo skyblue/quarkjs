@@ -1127,6 +1127,7 @@ DOMContext.prototype.draw = function(target)
 			if(targetDOM.parentNode != parentDOM) parentDOM.appendChild(targetDOM);
 			if(parentDOM.parentNode == null && parent instanceof Quark.Stage) 
 			{
+				parentDOM.style.pointerEvents = parentDOM.style.pointerEvents || "none";
 				this.canvas.appendChild(parentDOM);
 				parent._addedToDOM = true;
 			}
@@ -2684,6 +2685,37 @@ DisplayObject.prototype.toString = function()
 	return Quark.UIDUtil.displayObjectToString(this);
 };
 
+/**
+* 设置对齐的方式,动态计算regX,regY
+* @params atype
+*/
+DisplayObject.prototype.setAlign = function(align_type){
+	var reg = [this.regX,this.regY];
+	var _able = ['tl','tr','ct','bl','br'];
+	if(!~_able.indexOf(align_type)) return;
+	switch(align_type){
+		case "tl":
+			reg = [0,0];
+			break;
+		case "tr" :
+			reg = [this.width,0];
+			break;
+		case "ct" :
+			reg = [this.width/2,this.height/2];
+			break;
+		case "bl" :
+			reg = [0,this.height];
+			break;
+		case "br" :
+			reg = [this.width,this.height];
+			break;
+		default:
+			break;
+	}
+	this.regX = reg[0];
+	this.regY = reg[1];
+	return this;
+};
 })();
 
 
