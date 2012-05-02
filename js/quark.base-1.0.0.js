@@ -11,7 +11,7 @@ http://github.com/quark-dev-team/quarkjs
  * @name Quark
  * @class QuarkJS框架的全局对象，也是框架内部所有类的命名空间。
  */
-var Quark = win.Quark = win.Quark || 
+var Quark = win.Quark = win.Quark ||
 {
 	global: win
 };
@@ -20,7 +20,7 @@ var Quark = win.Quark = win.Quark ||
  * Quark框架的继承方法。
  */
 var emptyConstructor = function() {};
-Quark.inherit = function(childClass, parentClass) 
+Quark.inherit = function(childClass, parentClass)
 {
   	emptyConstructor.prototype = parentClass.prototype;
   	childClass.superClass = parentClass.prototype;
@@ -47,15 +47,15 @@ Quark.merge = function(obj, props, strict)
 Quark.delegate = function(func, self)
 {
 	var context = self || win;
-  	if (arguments.length > 2) 
+  	if (arguments.length > 2)
   	{
-    	var args = Array.prototype.slice.call(arguments, 2);    	
-    	return function() 
+    	var args = Array.prototype.slice.call(arguments, 2);
+    	return function()
     	{
       		var newArgs = Array.prototype.concat.apply(args, arguments);
       		return func.apply(context, newArgs);
     	};
-  	}else 
+  	}else
   	{
     	return function() {return func.apply(context, arguments);};
   	}
@@ -75,7 +75,7 @@ Quark.getDOM = function(id)
 Quark.createDOM = function(type, props)
 {
 	var dom = document.createElement(type);
-	for(var p in props) 
+	for(var p in props)
 	{
 		var val = props[p];
 		if(p == "style")
@@ -102,15 +102,15 @@ Quark.use = function(name)
 	}
 	return obj;
 };
-		
+
 /**
  * 浏览器的特性的简单检测，并非精确判断。
  */
 function detectBrowser(ns)
 {
-	var ua = ns.ua = navigator.userAgent;		
+	var ua = ns.ua = navigator.userAgent;
 	ns.isWebKit = (/webkit/i).test(ua);
-	ns.isMozilla = (/mozilla/i).test(ua);	
+	ns.isMozilla = (/mozilla/i).test(ua);
 	ns.isIE = (/msie/i).test(ua);
 	ns.isFirefox = (/firefox/i).test(ua);
 	ns.isChrome = (/chrome/i).test(ua);
@@ -172,10 +172,10 @@ Quark.createDOMDrawable = function(disObj, imageObj)
 		if(img)
 		{
 			var ctx = elem.getContext("2d");
-			var rect = imageObj.rect || [0, 0, w, h];		
-			ctx.drawImage(img, rect[0], rect[1], rect[2], rect[3], 
-						 (disObj.x || 0), (disObj.y || 0), 
-						 (disObj.width || rect[2]), 
+			var rect = imageObj.rect || [0, 0, w, h];
+			ctx.drawImage(img, rect[0], rect[1], rect[2], rect[3],
+						 (disObj.x || 0), (disObj.y || 0),
+						 (disObj.width || rect[2]),
 						 (disObj.height || rect[3]));
 		}
 	}else
@@ -205,14 +205,14 @@ Quark.hitTestPoint = function(obj, x, y, usePolyCollision)
 {
 	var b = obj.getBounds(), len = b.length;
 	var hit = x >= b.x && x <= b.x + b.width && y >= b.y && y <= b.y + b.height;
-	
+
 	if(hit && usePolyCollision)
 	{
-		var cross = 0, onBorder = false, minX, maxX, minY, maxY;		
+		var cross = 0, onBorder = false, minX, maxX, minY, maxY;
 		for(var i = 0; i < len; i++)
 		{
-			var p1 = b[i], p2 = b[(i+1)%len];			
-			
+			var p1 = b[i], p2 = b[(i+1)%len];
+
 			if(p1.y == p2.y && y == p1.y)
 			{
 				p1.x > p2.x ? (minX = p2.x, maxX = p1.x) : (minX = p1.x, maxX = p2.x);
@@ -222,15 +222,15 @@ Quark.hitTestPoint = function(obj, x, y, usePolyCollision)
 					continue;
 				}
 			}
-			
+
 			p1.y > p2.y ? (minY = p2.y, maxY = p1.y) : (minY = p1.y, maxY = p2.y);
 			if(y < minY || y > maxY) continue;
-			
+
 			var nx = (y - p1.y)*(p2.x - p1.x) / (p2.y - p1.y) + p1.x;
 			if(nx > x) cross++;
-			else if(nx == x) onBorder = true;			
+			else if(nx == x) onBorder = true;
 		}
-		
+
 		if(onBorder) return 0;
 		else if(cross % 2 == 1) return 1;
 		return -1;
@@ -244,9 +244,9 @@ Quark.hitTestPoint = function(obj, x, y, usePolyCollision)
 Quark.hitTestObject = function(obj1, obj2, usePolyCollision)
 {
 	var b1 = obj1.getBounds(), b2 = obj2.getBounds();
-	var hit = b1.x <= b2.x + b2.width && b2.x <= b1.x + b1.width && 
+	var hit = b1.x <= b2.x + b2.width && b2.x <= b1.x + b1.width &&
 				   b1.y <= b2.y + b2.height && b2.y <= b1.y + b1.height;
-	
+
 	if(hit && usePolyCollision)
 	{
 		hit = Quark.polygonCollision(b2, b2);
@@ -260,7 +260,7 @@ Quark.hitTestObject = function(obj1, obj2, usePolyCollision)
  * poly1,poly2是多边形顶点组成的数组。如[{x:0, y:0}, {x:10, y:0}, {x:10, y:10}, {x:0, y:10}]
  */
 Quark.polygonCollision = function(poly1, poly2)
-{	
+{
 	var result = doSATCheck(poly1, poly2, {overlap:-Infinity, normal:{x:0, y:0}});
 	if(result) return doSATCheck(poly2, poly1, result);
 	return false;
@@ -269,35 +269,35 @@ Quark.polygonCollision = function(poly1, poly2)
 function doSATCheck(poly1, poly2, result)
 {
 	var len1 = poly1.length, len2 = poly2.length, currentPoint, nextPoint, distance, min1, max1, min2, max2, dot, overlap, normal = {x:0, y:0};
-	
+
 	for(var i = 0; i < len1; i++)
 	{
 		currentPoint = poly1[i];
 		nextPoint = poly1[(i < len1-1 ? i+1 : 0)];
-		
+
 		normal.x = currentPoint.y - nextPoint.y;
 		normal.y = nextPoint.x - currentPoint.x;
-		
+
 		distance = Math.sqrt(normal.x * normal.x + normal.y * normal.y);
 		normal.x /= distance;
 		normal.y /= distance;
-		
-		min1 = max1 = poly1[0].x * normal.x + poly1[0].y * normal.y;		
+
+		min1 = max1 = poly1[0].x * normal.x + poly1[0].y * normal.y;
 		for(var j = 1; j < len1; j++)
 		{
 			dot = poly1[j].x * normal.x + poly1[j].y * normal.y;
 			if(dot > max1) max1 = dot;
 			else if(dot < min1) min1 = dot;
 		}
-		
-		min2 = max2 = poly2[0].x * normal.x + poly2[0].y * normal.y;		
+
+		min2 = max2 = poly2[0].x * normal.x + poly2[0].y * normal.y;
 		for(j = 1; j < len2; j++)
 		{
 			dot = poly2[j].x * normal.x + poly2[j].y * normal.y;
 			if(dot > max2) max2 = dot;
 			else if(dot < min2) min2 = dot;
 		}
-		
+
 		if(min1 < min2)
 		{
 			overlap = min2 - max1;
@@ -307,7 +307,7 @@ function doSATCheck(poly1, poly2, result)
 		{
 			overlap = min1 - max2;
 		}
-		
+
 		if(overlap >= 0)
 		{
 			return false;
@@ -318,7 +318,7 @@ function doSATCheck(poly1, poly2, result)
 			result.normal.y = normal.y;
 		}
 	}
-	
+
 	return result;
 };
 
@@ -344,7 +344,7 @@ Quark.trace = function()
  */
 if(win.Q == undefined) win.Q = Quark;
 if(win.trace == undefined) win.trace = Quark.trace;
-	
+
 })(window);
 
 
@@ -366,7 +366,7 @@ Matrix.prototype.concat = function(mtx)
 	var a = this.a;
 	var c = this.c;
 	var tx = this.tx;
-	
+
 	this.a = a * mtx.a + this.b * mtx.c;
 	this.b = a * mtx.b + this.b * mtx.d;
 	this.c = c * mtx.a + this.d * mtx.c;
@@ -380,11 +380,11 @@ Matrix.prototype.rotate = function(angle)
 {
 	var cos = Math.cos(angle);
 	var sin = Math.sin(angle);
-	
+
 	var a = this.a;
 	var c = this.c;
 	var tx = this.tx;
-	
+
 	this.a = a * cos - this.b * sin;
 	this.b = a * sin + this.b * cos;
 	this.c = c * cos - this.d * sin;
@@ -425,7 +425,7 @@ Matrix.prototype.invert = function()
 	var d = this.d;
 	var tx = this.tx;
 	var i = a * d - b * c;
-	
+
 	this.a = d / i;
 	this.b = -b / i;
 	this.c = -c / i;
@@ -502,12 +502,12 @@ Rectangle.prototype.union = function(rect, returnNew)
 {
  	var right = Math.max(this.x + this.width, rect.x + rect.width);
   	var bottom = Math.max(this.y + this.height, rect.y + rect.height);
-	
+
   	var x = Math.min(this.x, rect.x);
  	var y = Math.min(this.y, rect.y);
   	var width = right - x;
   	var height = bottom - y;
-  	if(returnNew) 
+  	if(returnNew)
   	{
   		return new Rectangle(x, y, width, height);
   	}else
@@ -526,12 +526,12 @@ Rectangle.prototype.containsPoint = function(x, y)
 
 Rectangle.prototype.clone = function()
 {
-	return new Rectangle(this.x, this.y, this.width, this.height);	
+	return new Rectangle(this.x, this.y, this.width, this.height);
 };
 
 Rectangle.prototype.toString = function()
 {
-	return "(x=" + this.x + ", y=" + this.y + ", width=" + this.width + ", height=" + this.height + ")";	
+	return "(x=" + this.x + ", y=" + this.y + ", width=" + this.width + ", height=" + this.height + ")";
 };
 
 })();
@@ -641,7 +641,7 @@ Quark.KEY = {
 	F11 : 122,
 	F12 : 123
 };
-	
+
 })();
 
 
@@ -688,16 +688,16 @@ EventManager.prototype.register = function(target, events, callback, preventDefa
 {
 	if(callback == null || (typeof callback == "function")) callback = {host:null, func:callback};
 	var params = {prevent:preventDefault, stop:stopPropagation};
-	
+
 	var me = this, handler = function(e){me._onEvent(e, params, callback);};
-	
+
 	for(var i = 0; i < events.length; i++)
 	{
 		var type = events[i], list = this._evtHandlers[type] || (this._evtHandlers[type] = []);
 		for(var j = 0, has = false; j < list.length; j++)
 		{
 			var li = list[j];
-			if(li.target == target && li.callback.func == callback.func) 
+			if(li.target == target && li.callback.func == callback.func)
 			{
 				trace("duplicate callback");
 				has = true;
@@ -740,25 +740,25 @@ EventManager.prototype.unregister = function(target, events, callback)
  * @private
  */
 EventManager.prototype._onEvent = function(e, params, callback)
-{	
+{
 	//correct touch events
     var ne = e, type = e.type, isTouch = e.type.indexOf("touch") == 0;
     if(isTouch)
     {
-        ne = (e.touches && e.touches.length > 0) ? e.touches[0] : 
+        ne = (e.touches && e.touches.length > 0) ? e.touches[0] :
             (e.changedTouches && e.changedTouches.length > 0) ? e.changedTouches[0] : e;
         ne.type = type;
     }
-	
+
 	if(type == "keydown" || type == "keyup" || type == "keypress")
 	{
 		this.keyState[e.keyCode] = type;
 	}
-	
+
 	//e.eventTime = Date.now();
-	
+
 	if(callback.func != null) callback.func.call(callback.host, ne);
-	
+
 	EventManager.stop(e, !params.prevent, !params.stop);
 };
 
@@ -777,7 +777,7 @@ EventManager.stop = function(e, continueDefault, continuePropagation)
 		if(e.stopImmediatePropagation) e.stopImmediatePropagation();
 	}
 };
-	
+
 })();
 
 
@@ -802,7 +802,7 @@ EventDispatcher.prototype.addEventListener = function(type, listener)
 {
 	var map = this._eventMap[type];
     if(map == null) map = this._eventMap[type] = [];
-    
+
     if(map.indexOf(listener) == -1)
     {
     	map.push(listener);
@@ -852,7 +852,7 @@ EventDispatcher.prototype.removeEventListenerByType = function(type)
  * 删除所有事件侦听器。
  */
 EventDispatcher.prototype.removeAllEventListeners = function()
-{	
+{
 	this._eventMap = {};
 };
 
@@ -862,7 +862,7 @@ EventDispatcher.prototype.removeAllEventListeners = function()
 EventDispatcher.prototype.dispatchEvent = function(event)
 {
 	var map = this._eventMap[event.type];
-	if(map == null) return false;	
+	if(map == null) return false;
 	if(!event.target) event.target = this;
     map = map.slice();
 
@@ -903,9 +903,9 @@ EventDispatcher.prototype.fire = EventDispatcher.prototype.dispatchEvent;
  * @class Context是Quark框架中显示对象结构的上下文，实现显示对象结构的渲染。此类为抽象类。
  */
 var Context = Quark.Context = function(props)
-{	
+{
 	if(props.canvas == null) throw "Quark.Context Error: canvas is required.";
-	
+
 	this.canvas = null;
 	Quark.merge(this, props);
 };
@@ -969,7 +969,7 @@ CanvasContext.prototype.draw = function(target)
 {
 	//ignore children drawing if the parent has a mask.
 	if(target.parent != null && target.parent.mask != null) return;
-	
+
 	if(target.mask != null)
 	{
 		//we implements the mask function by using 'source-in' composite operation.
@@ -982,7 +982,7 @@ CanvasContext.prototype.draw = function(target)
 		context.startDraw();
 		target.mask._render(context);
 		ctx.globalCompositeOperation = 'source-in';
-		
+
 		//this is a trick for ignoring mask drawing during object drawing.
 		var mask = target.mask;
 		target.mask = null;
@@ -1015,7 +1015,7 @@ CanvasContext.prototype.draw = function(target)
 		if(img != null)
 		{
 			arguments[0] = img;
-			this.context.drawImage.apply(this.context, arguments);	
+			this.context.drawImage.apply(this.context, arguments);
 		}
 	}
 };
@@ -1025,7 +1025,7 @@ CanvasContext.prototype.draw = function(target)
  */
 CanvasContext.prototype.endDraw = function()
 {
-	this.context.restore();	
+	this.context.restore();
 };
 
 /**
@@ -1034,7 +1034,7 @@ CanvasContext.prototype.endDraw = function()
 CanvasContext.prototype.transform = function(target)
 {
 	var ctx = this.context;
-	
+
 	if(target instanceof Q.Stage)
 	{
 		//Use style for stage scaling
@@ -1055,7 +1055,7 @@ CanvasContext.prototype.transform = function(target)
 		if(target.scaleX != 1 || target.scaleY != 1) ctx.scale(target.scaleX, target.scaleY);
 		if(target.regX != 0 || target.regY != 0) ctx.translate(-target.regX, -target.regY);
 	}
-	
+
 	if(target.alpha > 0) ctx.globalAlpha *= target.alpha;
 };
 
@@ -1082,15 +1082,15 @@ var supportTransform = testElem.style[Quark.cssPrefix + "Transform"] != undefine
 var supportTransform3D = testElem.style[Quark.cssPrefix + "Perspective"] != undefined;
 var docElem = document.documentElement;
 if(supportTransform3D && 'webkitPerspective' in docElem.style)
-{		
+{
 	testElem.id = 'test3d';
 	var st = document.createElement('style');
 	st.textContent = '@media (-webkit-transform-3d){#test3d{height:3px}}';
 	document.head.appendChild(st);
 	docElem.appendChild(testElem);
-	
+
 	supportTransform3D = testElem.offsetHeight === 3;
-	
+
 	st.parentNode.removeChild(st);
 	testElem.parentNode.removeChild(testElem);
 };
@@ -1127,7 +1127,7 @@ DOMContext.prototype.draw = function(target)
 		{
 			var parentDOM = parent.getDrawable(this);
 			if(targetDOM.parentNode != parentDOM) parentDOM.appendChild(targetDOM);
-			if(parentDOM.parentNode == null && parent instanceof Quark.Stage) 
+			if(parentDOM.parentNode == null && parent instanceof Quark.Stage)
 			{
 				parentDOM.style.pointerEvents = parentDOM.style.pointerEvents || "none";
 				this.canvas.appendChild(parentDOM);
@@ -1142,16 +1142,16 @@ DOMContext.prototype.draw = function(target)
  * 对指定的显示对象的DOM进行css属性设置或变换。
  */
 DOMContext.prototype.transform = function(target)
-{	
+{
 	var image = target.getDrawable(this);
 	//优化：可以对那些添加到DOM后就不再需要变换的显示对象设置transformEnabled=false。
 	if(!target.transformEnabled && target._addedToDOM) return;
-	
-	var prefix = Quark.cssPrefix, 
-		origin = prefix + "TransformOrigin", 
+
+	var prefix = Quark.cssPrefix,
+		origin = prefix + "TransformOrigin",
 		transform = prefix + "Transform",
 		style = image.style;
-	
+
 	if(!style.display || target.propChanged("visible", "alpha"))
 	{
 		style.display = (!target.visible || target.alpha <= 0) ? "none" : "";
@@ -1172,7 +1172,7 @@ DOMContext.prototype.transform = function(target)
 	if(!style[origin] || target.propChanged("regX", "regY"))
 	{
 		style[origin] = target.regX + "px " + target.regY + "px";
-	}	
+	}
 	if(!style[transform] || target.propChanged("x", "y", "regX", "regY", "scaleX", "scaleY", "rotation"))
 	{
 		var css = Quark.supportTransform3D ? getTransformCSS(target, true) : getTransformCSS(target, false);
@@ -1202,7 +1202,7 @@ function getTransformCSS(target, useTransform3D)
 	{
 		css += "translate3d(" + (target.x-target.regX) + "px, " + (target.y-target.regY) + "px, 0px)"
 			+ "rotate3d(0, 0, 1, " + target.rotation + "deg)"
-			+ "scale3d(" + target.scaleX + ", " + target.scaleY + ", 1)";			
+			+ "scale3d(" + target.scaleX + ", " + target.scaleY + ", 1)";
 	}else
 	{
 		css += "translate(" + (target.x-target.regX) + "px, " + (target.y-target.regY) + "px)"
@@ -1319,14 +1319,14 @@ Quark.addMeta = function(props)
  */
 Quark.toggleDebugRect = function(stage)
 {
-	stage.debug = !stage.debug;	
+	stage.debug = !stage.debug;
 	if(stage.debug)
 	{
 		stage._render = function(context)
 		{
 			if(context.clear != null) context.clear(0, 0, stage.width, stage.height);
 			Quark.Stage.superClass._render.call(stage, context);
-			
+
 			var ctx = stage.context.context;
 			if(ctx != null)
 			{
@@ -1365,21 +1365,21 @@ function drawObjectRect(obj, ctx)
 			if(ctx != null)
 			{
 				var b = child.getBounds();
-								
+
 				ctx.globalAlpha = 0.2;
 				ctx.beginPath();
 				var p0 = b[0];
-				ctx.moveTo(p0.x-0.5, p0.y-0.5);						
+				ctx.moveTo(p0.x-0.5, p0.y-0.5);
 				for(var j = 1; j < b.length; j++)
 				{
-					var p = b[j];					
-					ctx.lineTo(p.x-0.5, p.y-0.5);	
+					var p = b[j];
+					ctx.lineTo(p.x-0.5, p.y-0.5);
 				}
 				ctx.lineTo(p0.x-0.5, p0.y-0.5);
 				ctx.stroke();
 				ctx.closePath();
 				ctx.globalAlpha = 0.5;
-				
+
 				ctx.beginPath();
 				ctx.rect((b.x>>0)-0.5, (b.y>>0)-0.5, b.width>>0, b.height>>0);
 				ctx.stroke();
@@ -1387,7 +1387,7 @@ function drawObjectRect(obj, ctx)
 			}else
 			{
 				if(child.drawable.domDrawable) child.drawable.domDrawable.style.border = "1px solid #f00";
-			}	
+			}
 		}
 	}
 };
@@ -1407,7 +1407,7 @@ Quark.cacheObject = function(obj, toImage, type)
 	obj.mask = null;
 	obj.render(context);
 	obj.mask = mask;
-	
+
 	if(toImage)
 	{
 		var img = new Image();
@@ -1439,9 +1439,9 @@ Quark._helpContext = new Quark.CanvasContext({canvas:Quark.createDOM("canvas")})
  * @param interval 计时器的时间间隔。以毫秒为单位。
  */
 var Timer = Quark.Timer = function(interval)
-{	
+{
 	this.interval = interval || 50;
-	this.paused = false;	
+	this.paused = false;
 	this.info = {lastTime:0, currentTime:0, deltaTime:0, realDeltaTime:0};
 
 	this._startTime = 0;
@@ -1494,11 +1494,11 @@ Timer.prototype.resume = function()
 Timer.prototype._run = function()
 {
 	if(this.paused) return;
-	
+
 	var info = this.info;
 	var time = info.currentTime = Date.now();
 	info.deltaTime = info.realDeltaTime = time - info.lastTime;
-	
+
 	for(var i = 0, len = this._listeners.length, obj, runTime; i < len; i++)
 	{
 		obj = this._listeners[i];
@@ -1514,7 +1514,7 @@ Timer.prototype._run = function()
 			len--;
 		}
 	}
-	
+
 	info.lastTime = time;
 };
 
@@ -1566,16 +1566,16 @@ Timer.prototype.removeListener = function(obj)
  */
 var ImageLoader = Quark.ImageLoader = function(source)
 {
-	ImageLoader.superClass.constructor.call(this);	
-	
+	ImageLoader.superClass.constructor.call(this);
+
 	this.loading = false; //ready-only
-	
+
 	this._index = -1;
 	this._loaded = 0;
 	this._images = {};
 	this._totalSize = 0;
 	this._loadHandler = Quark.delegate(this._loadHandler, this);
-	
+
 	this._addSource(source);
 };
 Quark.inherit(ImageLoader, Quark.EventDispatcher);
@@ -1592,7 +1592,7 @@ ImageLoader.prototype.load = function(source)
 
 /**
  * 添加图片资源。
- * @private 
+ * @private
  */
 ImageLoader.prototype._addSource = function(source)
 {
@@ -1621,7 +1621,7 @@ ImageLoader.prototype._loadNext = function()
 		this._index = -1;
 		return;
 	}
-	
+
 	var img = new Image();
 	img.onload = this._loadHandler;
 	img.src = this._source[this._index].src;
@@ -1633,13 +1633,13 @@ ImageLoader.prototype._loadNext = function()
  * @private
  */
 ImageLoader.prototype._loadHandler = function(e)
-{	
+{
 	this._loaded++;
 	var image = this._source[this._index];
 	image.image = e.target;
 	var id = image.id || image.src;
 	this._images[id] = image;
-	this.dispatchEvent({type:"loaded", target:this, image:image});	
+	this.dispatchEvent({type:"loaded", target:this, image:image});
 	this._loadNext();
 };
 
@@ -1706,11 +1706,11 @@ var Tween = Quark.Tween = function(target, newProps, params)
 	this.interval = 0;
 	this.ease = Easing.Linear.EaseNone;
 	this.next = null;
-	
+
 	this.onStart = null;
 	this.onUpdate = null;
 	this.onComplete = null;
-	
+
 	this._oldProps = {};
 	this._newProps = {};
 	this._deltaProps = {};
@@ -1723,7 +1723,7 @@ var Tween = Quark.Tween = function(target, newProps, params)
 	this._frameCount = 0;
 
 	for(var p in newProps)
-	{		
+	{
 		var oldVal = target[p], newVal = newProps[p];
 		if(oldVal !== undefined)
 		{
@@ -1776,7 +1776,7 @@ Tween.prototype._init = function()
  * 启动缓动动画的播放。
  */
 Tween.prototype.start = function()
-{	
+{
 	this._init();
 	this.paused = false;
 };
@@ -1793,7 +1793,7 @@ Tween.prototype.stop = function()
  * 暂停缓动动画的播放。
  */
 Tween.prototype.pause = function()
-{	
+{
 	this.paused = true;
 	this._pausedStartTime = Date.now();
 };
@@ -1802,7 +1802,7 @@ Tween.prototype.pause = function()
  * 恢复缓动动画的播放。
  */
 Tween.prototype.resume = function()
-{	
+{
 	this.paused = false;
 	this._pausedTime += Date.now() - this._pausedStartTime;
 };
@@ -1817,10 +1817,10 @@ Tween.prototype._update = function()
 	var now = Date.now();
 	var elapsed = now - this._startTime - this._pausedTime;
 	if(elapsed < 0) return;
-	
+
 	if(this._lastTime == 0 && this.onStart != null) this.onStart(this);
 	this._lastTime = now;
-	
+
 	var ratio = this._frameTotal > 0 ? (++this._frameCount / this._frameTotal) : (elapsed / this.time);
 	if(ratio > 1) ratio = 1;
 	var value = this.ease(ratio);
@@ -1829,11 +1829,11 @@ Tween.prototype._update = function()
 	{
 		this.target[p] = this._oldProps[p] + this._deltaProps[p] * this._reverseFlag * value;
 	}
-	
+
 	if(this.onUpdate != null) this.onUpdate(this, value);
 
 	if(ratio >= 1)
-	{	
+	{
 		if(this.reverse)
 		{
 			var tmp = this._oldProps;
@@ -1869,7 +1869,7 @@ Tween.prototype._update = function()
 				}
 			}
 		}
-		if(this.onComplete != null) this.onComplete(this);	
+		if(this.onComplete != null) this.onComplete(this);
 	}
 };
 
@@ -1946,18 +1946,18 @@ Tween.from = function(target, fromProps, params)
 /**
  * 缓动函数集合。
  */
-var Easing = Quark.Easing = 
+var Easing = Quark.Easing =
 {
-	Linear: {}, 
-	Quadratic: {}, 
-	Cubic: {}, 
-	Quartic: {}, 
-	Quintic: {}, 
-	Sinusoidal: {}, 
-	Exponential: {}, 
-	Circular: {}, 
-	Elastic: {}, 
-	Back: {}, 
+	Linear: {},
+	Quadratic: {},
+	Cubic: {},
+	Quartic: {},
+	Quintic: {},
+	Sinusoidal: {},
+	Exponential: {},
+	Circular: {},
+	Elastic: {},
+	Back: {},
 	Bounce: {}
 };
 
@@ -1971,7 +1971,7 @@ Easing.Quadratic.EaseIn = function(k)
 	return k * k;
 };
 
-Easing.Quadratic.EaseOut = function(k) 
+Easing.Quadratic.EaseOut = function(k)
 {
 	return - k * (k - 2);
 };
@@ -1982,7 +1982,7 @@ Easing.Quadratic.EaseInOut = function(k)
 	return -0.5 * (--k * (k - 2) - 1);
 };
 
-Easing.Cubic.EaseIn = function(k) 
+Easing.Cubic.EaseIn = function(k)
 {
 	return k * k * k;
 };
@@ -1992,13 +1992,13 @@ Easing.Cubic.EaseOut = function(k)
 	return --k * k * k + 1;
 };
 
-Easing.Cubic.EaseInOut = function(k) 
+Easing.Cubic.EaseInOut = function(k)
 {
 	if((k *= 2) < 1) return 0.5 * k * k * k;
 	return 0.5 * ((k -= 2) * k * k + 2);
 };
 
-Easing.Quartic.EaseIn = function(k) 
+Easing.Quartic.EaseIn = function(k)
 {
 	return k * k * k * k;
 };
@@ -2019,7 +2019,7 @@ Easing.Quintic.EaseIn = function(k)
 	return k * k * k * k * k;
 };
 
-Easing.Quintic.EaseOut = function(k) 
+Easing.Quintic.EaseOut = function(k)
 {
 	return (k = k - 1) * k * k * k * k + 1;
 };
@@ -2030,7 +2030,7 @@ Easing.Quintic.EaseInOut = function(k)
 	return 0.5 * ((k -= 2) * k * k * k * k + 2);
 };
 
-Easing.Sinusoidal.EaseIn = function(k) 
+Easing.Sinusoidal.EaseIn = function(k)
 {
 	return -Math.cos(k * Math.PI / 2) + 1;
 };
@@ -2045,12 +2045,12 @@ Easing.Sinusoidal.EaseInOut = function(k)
 	return -0.5 * (Math.cos(Math.PI * k) - 1);
 };
 
-Easing.Exponential.EaseIn = function(k) 
+Easing.Exponential.EaseIn = function(k)
 {
 	return k == 0 ? 0 : Math.pow(2, 10 * (k - 1));
 };
 
-Easing.Exponential.EaseOut = function(k) 
+Easing.Exponential.EaseOut = function(k)
 {
 	return k == 1 ? 1 : -Math.pow(2, -10 * k) + 1;
 };
@@ -2063,12 +2063,12 @@ Easing.Exponential.EaseInOut = function(k)
 	return 0.5 * (-Math.pow(2, - 10 * (k - 1)) + 2);
 };
 
-Easing.Circular.EaseIn = function(k) 
+Easing.Circular.EaseIn = function(k)
 {
 	return -(Math.sqrt(1 - k * k) - 1);
 };
 
-Easing.Circular.EaseOut = function(k) 
+Easing.Circular.EaseOut = function(k)
 {
 	return Math.sqrt(1 - --k * k);
 };
@@ -2079,10 +2079,10 @@ Easing.Circular.EaseInOut = function(k)
 	return 0.5 * ( Math.sqrt(1 - (k -= 2) * k) + 1);
 };
 
-Easing.Elastic.EaseIn = function(k) 
+Easing.Elastic.EaseIn = function(k)
 {
 	var s, a = 0.1, p = 0.4;
-	if (k == 0) return 0; 
+	if (k == 0) return 0;
 	else if (k == 1) return 1;
 	else if (!p) p = 0.3;
 	if(!a || a < 1) { a = 1; s = p / 4; }
@@ -2090,22 +2090,22 @@ Easing.Elastic.EaseIn = function(k)
 	return -(a * Math.pow(2, 10 * (k -= 1)) * Math.sin((k - s) * (2 * Math.PI) / p));
 };
 
-Easing.Elastic.EaseOut = function(k) 
+Easing.Elastic.EaseOut = function(k)
 {
 	var s, a = 0.1, p = 0.4;
-	if(k == 0) return 0; 
-	else if (k == 1) return 1; 
+	if(k == 0) return 0;
+	else if (k == 1) return 1;
 	else if (!p) p = 0.3;
 	if(!a || a < 1) { a = 1; s = p / 4; }
 	else s = p / (2 * Math.PI) * Math.asin(1 / a);
 	return (a * Math.pow(2, -10 * k) * Math.sin((k - s) * (2 * Math.PI) / p) + 1);
 };
 
-Easing.Elastic.EaseInOut = function(k) 
+Easing.Elastic.EaseInOut = function(k)
 {
 	var s, a = 0.1, p = 0.4;
-	if (k == 0) return 0; 
-	else if (k == 1) return 1; 
+	if (k == 0) return 0;
+	else if (k == 1) return 1;
 	else if (!p) p = 0.3;
 	if(!a || a < 1) { a = 1; s = p / 4; }
 	else s = p / (2 * Math.PI) * Math.asin(1 / a);
@@ -2114,7 +2114,7 @@ Easing.Elastic.EaseInOut = function(k)
 
 };
 
-Easing.Back.EaseIn = function(k) 
+Easing.Back.EaseIn = function(k)
 {
 	var s = 1.70158;
 	return k * k * ((s + 1) * k - s);
@@ -2126,14 +2126,14 @@ Easing.Back.EaseOut = function(k)
 	return (k = k - 1) * k * (( s + 1) * k + s) + 1;
 };
 
-Easing.Back.EaseInOut = function(k) 
+Easing.Back.EaseInOut = function(k)
 {
 	var s = 1.70158 * 1.525;
 	if ((k *= 2) < 1) return 0.5 * (k * k * ((s + 1) * k - s));
 	return 0.5 * ((k -= 2) * k * ((s + 1) * k + s) + 2);
 };
 
-Easing.Bounce.EaseIn = function(k) 
+Easing.Bounce.EaseIn = function(k)
 {
 	return 1 - Easing.Bounce.EaseOut(1 - k);
 };
@@ -2146,7 +2146,7 @@ Easing.Bounce.EaseOut = function(k)
 	}else if(k < (2 / 2.75))
 	{
 		return 7.5625 * (k -= (1.5 / 2.75)) * k + 0.75;
-	}else if(k < (2.5 / 2.75)) 
+	}else if(k < (2.5 / 2.75))
 	{
 		return 7.5625 * (k -= (2.25 / 2.75)) * k + 0.9375;
 	}else
@@ -2155,7 +2155,7 @@ Easing.Bounce.EaseOut = function(k)
 	}
 };
 
-Easing.Bounce.EaseInOut = function(k) 
+Easing.Bounce.EaseInOut = function(k)
 {
 	if(k < 0.5) return Easing.Bounce.EaseIn(k * 2) * 0.5;
 	return Easing.Bounce.EaseOut(k * 2 - 1) * 0.5 + 0.5;
@@ -2177,17 +2177,17 @@ Easing.Bounce.EaseInOut = function(k)
  * @param loop 指示是否循环播放。
  */
 var Audio = Quark.Audio = function(src, preload, autoPlay, loop)
-{	
+{
     Audio.superClass.constructor.call(this);
-    
+
     this.src = src;
 	this.autoPlay = preload && autoPlay;
 	this.loop = loop;
-	
+
 	this._loaded = false;
     this._playing = false;
 	this._evtHandler = Quark.delegate(this._evtHandler, this);
-	
+
 	this._element = document.createElement('audio');
 	this._element.preload = preload;
 	this._element.src = src;
@@ -2199,14 +2199,14 @@ Quark.inherit(Audio, Quark.EventDispatcher);
  * 开始加载声音文件。
  */
 Audio.prototype.load = function()
-{	
+{
 	this._element.addEventListener("progress", this._evtHandler, false);
 	this._element.addEventListener("ended", this._evtHandler, false);
 	this._element.addEventListener("error", this._evtHandler, false);
     try{
         this._element.load();
     }catch(e){trace(e);};
-	
+
 };
 
 /**
@@ -2301,9 +2301,9 @@ Audio.prototype.playing = function()
  * @class Drawable是可绘制图像或DOM的包装。当封装的是HTMLImageElement、HTMLCanvasElement或HTMLVideoElement对象时，可同时支持canvas和dom两种渲染方式，而如果封装的是dom时，则不支持canvas方式。
  */
 var Drawable = Quark.Drawable = function(drawable, isDOM)
-{	
+{
 	this.rawDrawable = null;
-	this.domDrawable = null;	
+	this.domDrawable = null;
 	this.set(drawable, isDOM);
 };
 
@@ -2343,7 +2343,7 @@ Drawable.prototype.set = function(drawable, isDOM)
 function isDrawable(elem)
 {
 	if(elem == null) return false;
-	return (elem instanceof HTMLImageElement) || 
+	return (elem instanceof HTMLImageElement) ||
 	  	   (elem instanceof HTMLCanvasElement) ||
 	   	   (elem instanceof HTMLVideoElement);
 };
@@ -2378,11 +2378,11 @@ function isDrawable(elem)
  * @property polyArea 指示DisplayObject对象的多边形碰撞区域。默认为null，即使用对象的外包围矩形。
  * @property mask 指示DisplayObject对象的遮罩对象。当上下文为DOMContext时暂时只支持webkit内核浏览器。默认为null。
  * @property parent DisplayObject对象的父容器。只读属性。
- */	
+ */
 var DisplayObject = Quark.DisplayObject = function(props)
 {
 	this.id = Quark.UIDUtil.createUID("DisplayObject");
-	
+
 	this.name = null;
 	this.x = 0;
 	this.y = 0;
@@ -2402,16 +2402,16 @@ var DisplayObject = Quark.DisplayObject = function(props)
 	this.mask = null;
 
 	this.drawable = null;
-	this.parent = null;	
+	this.parent = null;
 	this.context = null;
-	
+
 	this._depth = 0;
 	this._lastState = {};
 	this._stateList = ["x", "y", "regX", "regY", "width", "height", "alpha", "scaleX", "scaleY", "rotation", "visible", "_depth"];
 
 	Quark.merge(this, props, true);
 	if(props.mixin) Quark.merge(this, props.mixin, false);
-
+	if(this.align) this.setAlign(this.align);
 	DisplayObject.superClass.constructor.call(this, props);
 };
 Quark.inherit(DisplayObject, Quark.EventDispatcher);
@@ -2420,7 +2420,7 @@ Quark.inherit(DisplayObject, Quark.EventDispatcher);
  * 设置可绘制对象，默认是一个Image对象，可通过覆盖此方法进行DOM绘制。
  */
 DisplayObject.prototype.setDrawable = function(drawable)
-{ 
+{
 	if(this.drawable == null)
 	{
 		this.drawable = new Quark.Drawable(drawable);
@@ -2443,7 +2443,7 @@ DisplayObject.prototype.getDrawable = function(context)
  * 对象数据更新接口，仅供框架内部或组件开发者使用。用户通常应该重写update方法。
  */
 DisplayObject.prototype._update = function(timeInfo)
-{ 
+{
 	this.update(timeInfo);
 };
 
@@ -2458,13 +2458,13 @@ DisplayObject.prototype.update = function(timeInfo){ return true; };
 DisplayObject.prototype._render = function(context)
 {
 	var ctx = this.context || context;
-	if(!this.visible || this.alpha <= 0) 
+	if(!this.visible || this.alpha <= 0)
 	{
 		if(ctx.hide != null) ctx.hide(this);
 		this.saveState(["visible", "alpha"]);
 		return;
 	}
-	
+
 	ctx.startDraw();
 	ctx.transform(this);
 	this.render(ctx);
@@ -2546,7 +2546,7 @@ DisplayObject.prototype.localToGlobal = function(x, y)
 /**
  * 将x和y指定的点从舞台（全局）坐标转换为显示对象的（本地）坐标。
  */
-DisplayObject.prototype.globalToLocal = function(x, y) 
+DisplayObject.prototype.globalToLocal = function(x, y)
 {
 	var cm = this.getConcatenatedMatrix().invert();
 	return {x:cm.tx+x, y:cm.ty+y};
@@ -2555,7 +2555,7 @@ DisplayObject.prototype.globalToLocal = function(x, y)
 /**
  * 将x和y指定的点从显示对象的（本地）坐标转换为指定对象的坐标系里坐标。
  */
-DisplayObject.prototype.localToTarget = function(x, y, target) 
+DisplayObject.prototype.localToTarget = function(x, y, target)
 {
 	var p = this.localToGlobal(x, y);
 	return target.globalToLocal(p.x, p.y);
@@ -2564,12 +2564,12 @@ DisplayObject.prototype.localToTarget = function(x, y, target)
 /**
  * 获得一个对象相对于其某个祖先（默认即舞台）的连接矩阵。
  */
-DisplayObject.prototype.getConcatenatedMatrix = function(ancestor) 
-{	
+DisplayObject.prototype.getConcatenatedMatrix = function(ancestor)
+{
 	var mtx = new Quark.Matrix(1, 0, 0, 1, 0, 0);
 	if(ancestor == this) return mtx;
 	for(var o = this; o.parent != null && o.parent != ancestor; o = o.parent)
-	{		
+	{
 		var cos = 1, sin = 0;
 		if(o.rotation%360 != 0)
 		{
@@ -2577,10 +2577,10 @@ DisplayObject.prototype.getConcatenatedMatrix = function(ancestor)
 			cos = Math.cos(r);
 			sin = Math.sin(r);
 		}
-		
+
 		if(o.regX != 0) mtx.tx -= o.regX;
 		if(o.regY != 0) mtx.ty -= o.regY;
-		
+
 		mtx.concat(new Quark.Matrix(cos*o.scaleX, sin*o.scaleX, -sin*o.scaleY, cos*o.scaleY, o.x, o.y));
 	}
 	return mtx;
@@ -2590,18 +2590,18 @@ DisplayObject.prototype.getConcatenatedMatrix = function(ancestor)
  * 返回DisplayObject对象在舞台全局坐标系内的矩形区域以及所有顶点。
  */
 DisplayObject.prototype.getBounds = function()
-{	
+{
 	var w = this.width, h = this.height;
 	var mtx = this.getConcatenatedMatrix();
-	
+
 	var poly = this.polyArea || [{x:0, y:0}, {x:w, y:0}, {x:w, y:h}, {x:0, y:h}];
-	
-	var vertexs = [], len = poly.length, v, minX, maxX, minY, maxY;	
+
+	var vertexs = [], len = poly.length, v, minX, maxX, minY, maxY;
 	v = mtx.transformPoint(poly[0], true, true);
 	minX = maxX = v.x;
 	minY = maxY = v.y;
 	vertexs[0] = v;
-	
+
 	for(var i = 1; i < len; i++)
 	{
 		var v = mtx.transformPoint(poly[i], true, true);
@@ -2611,7 +2611,7 @@ DisplayObject.prototype.getBounds = function()
 		else if(maxY < v.y) maxY = v.y;
 		vertexs[i] = v;
 	}
-	
+
 	vertexs.x = minX;
 	vertexs.y = minY;
 	vertexs.width = maxX - minX;
@@ -2670,7 +2670,7 @@ Quark.DisplayObject.prototype.uncache = function()
  * 把DisplayObject对象转换成dataURL格式的位图。
  */
 Quark.DisplayObject.prototype.toImage = function(type)
-{	
+{
 	return Quark.cacheObject(this, true, type);
 };
 
@@ -2688,7 +2688,7 @@ DisplayObject.prototype.toString = function()
 */
 DisplayObject.prototype.setAlign = function(align_type){
 	var reg = [this.regX,this.regY];
-	var _able = ['tl','tr','ct','bl','br'];
+	var _able = ['tl','tr','ct','bl','br',"tc","bc","lc","rc"];
 	if(!~_able.indexOf(align_type)) return;
 	switch(align_type){
 		case "tl":
@@ -2702,9 +2702,14 @@ DisplayObject.prototype.setAlign = function(align_type){
 			break;
 		case "bl" :
 			reg = [0,this.height];
-			break;
 		case "br" :
 			reg = [this.width,this.height];
+			break;
+		case "tc" :
+			reg = [this.width/2,0];
+			break;
+		case "bc" :
+			reg = [this.width/2,this.height];
 			break;
 		default:
 			break;
@@ -2734,11 +2739,11 @@ var DisplayObjectContainer = Quark.DisplayObjectContainer = function(props)
 	this.children = [];
 
 	props = props || {};
-	DisplayObjectContainer.superClass.constructor.call(this, props);		
+	DisplayObjectContainer.superClass.constructor.call(this, props);
 	this.id = props.id || Quark.UIDUtil.createUID("DisplayObjectContainer");
 
 	this.setDrawable(props.drawable || props.image || null);
-	
+
 	if(props.children)
 	{
 		for(var i = 0; i < props.children.length; i++)
@@ -2756,7 +2761,7 @@ DisplayObjectContainer.prototype.addChildAt = function(child, index)
 {
 	if(index < 0) index = 0;
 	else if(index > this.children.length) index = this.children.length;
-	
+
 	var childIndex = this.getChildIndex(child);
 	if(childIndex != -1)
 	{
@@ -2769,16 +2774,16 @@ DisplayObjectContainer.prototype.addChildAt = function(child, index)
 
 	this.children.splice(index, 0, child);
 	child.parent = this;
-	
+
 	if(this.autoSize)
-	{		
+	{
 		var rect = new Quark.Rectangle(0, 0, this.rectWidth || this.width, this.rectHeight || this.height);
 		var childRect = new Quark.Rectangle(child.x, child.y, child.rectWidth || child.width, child.rectHeight || child.height);
 		rect.union(childRect);
 		this.width = rect.width;
 		this.height = rect.height;
 	}
-	
+
 	return this;
 };
 
@@ -2786,7 +2791,7 @@ DisplayObjectContainer.prototype.addChildAt = function(child, index)
  * 将一个DisplayObject子实例添加到该DisplayObjectContainer实例的子级列表中。
  */
 DisplayObjectContainer.prototype.addChild = function(child)
-{	
+{
 	var start = this.children.length;
 	for(var i = 0; i < arguments.length; i++)
 	{
@@ -2803,7 +2808,7 @@ DisplayObjectContainer.prototype.removeChildAt = function(index)
 {
 	if (index < 0 || index >= this.children.length) return false;
 	var child = this.children[index];
-	if (child != null) 
+	if (child != null)
 	{
 		var stage = this.getStage();
 		if(stage != null) stage.context.remove(child);
@@ -2895,10 +2900,10 @@ DisplayObjectContainer.prototype.getChildById = function(id)
  * 删除并返回DisplayObjectContainer中指定id的子显示对象。
  */
 DisplayObjectContainer.prototype.removeChildById = function(id)
-{	
+{
 	for(var i = 0, len = this.children.length; i < len; i++)
 	{
-		if(this.children[i].id == id) 
+		if(this.children[i].id == id)
 		{
 			return this.removeChildAt(i);
 		}
@@ -2948,7 +2953,7 @@ DisplayObjectContainer.prototype._update = function(timeInfo)
 	var result = true;
 	if(this.update != null) result = this.update(timeInfo);
 	if(result === false) return;
-	
+
 	var copy = this.children.slice(0);
 	for(var i = 0, len = copy.length; i < len; i++)
 	{
@@ -2964,7 +2969,7 @@ DisplayObjectContainer.prototype._update = function(timeInfo)
 DisplayObjectContainer.prototype.render = function(context)
 {
 	DisplayObjectContainer.superClass.render.call(this, context);
-	
+
 	for(var i = 0, len = this.children.length; i < len; i++)
 	{
 		var child = this.children[i];
@@ -2978,14 +2983,14 @@ DisplayObjectContainer.prototype.render = function(context)
 DisplayObjectContainer.prototype.getObjectUnderPoint = function(x, y, usePolyCollision, returnAll)
 {
 	if(returnAll) var result = [];
-	
+
 	for(var i = this.children.length - 1; i >= 0; i--)
 	{
 		var child = this.children[i];
 		if(child == null || (!child.eventEnabled && child.children == undefined) || !child.visible || child.alpha <= 0) continue;
-		
+
 		if(child.children != undefined && child.eventChildren && child.getNumChildren() > 0)
-		{			
+		{
 			var obj = child.getObjectUnderPoint(x, y, usePolyCollision, returnAll);
 			if(obj)
 			{
@@ -2998,7 +3003,7 @@ DisplayObjectContainer.prototype.getObjectUnderPoint = function(x, y, usePolyCol
 			}
 		}else
 		{
-			if(child.hitTestPoint(x, y, usePolyCollision) >= 0) 
+			if(child.hitTestPoint(x, y, usePolyCollision) >= 0)
 			{
 				if(returnAll) result.push(child);
 				else return child;
@@ -3008,7 +3013,7 @@ DisplayObjectContainer.prototype.getObjectUnderPoint = function(x, y, usePolyCol
 	if(returnAll) return result;
 	return null;
 };
-	
+
 })();
 
 
@@ -3030,14 +3035,14 @@ var Stage = Quark.Stage = function(props)
 	this.stageX = 0;
 	this.stageY = 0;
 	this.paused = false;
-	  
+
 	this._eventTarget = null;
-	
+
 	props = props || {};
 	Stage.superClass.constructor.call(this, props);
-	this.id = props.id || Quark.UIDUtil.createUID("Stage");	
+	this.id = props.id || Quark.UIDUtil.createUID("Stage");
 	if(this.context == null) throw "Quark.Stage Error: context is required.";
-	
+
 	this.updatePosition();
 };
 Quark.inherit(Stage, Quark.DisplayObjectContainer);
@@ -3056,7 +3061,7 @@ Stage.prototype.step = function(timeInfo)
  * 更新舞台Stage上所有显示对象的数据。
  */
 Stage.prototype._update = function(timeInfo)
-{	
+{
 	//Stage作为根容器，先更新所有子对象，再调用update方法。
 	var copy = this.children.slice(0);
 	for(var i = 0, len = copy.length; i < len; i++)
@@ -3083,16 +3088,16 @@ Stage.prototype._render = function(context)
  * 舞台Stage默认的事件处理器。
  */
 Stage.prototype.dispatchEvent = function(e)
-{	
+{
 	var x = e.pageX || e.clientX, y = e.pageY || e.clientY;
 	x = (x - this.stageX) / this.scaleX;
 	y = (y - this.stageY) / this.scaleY;
 	var obj = this.getObjectUnderPoint(x, y, true), target = this._eventTarget;
-	
+
 	e.eventX = x;
 	e.eventY = y;
-	
-	var leave = e.type == "mouseout" && !this.context.canvas.contains(e.relatedTarget);	
+
+	var leave = e.type == "mouseout" && !this.context.canvas.contains(e.relatedTarget);
 	if(target != null && (target != obj || leave))
 	{
 		e.lastEventTarget = target;
@@ -3101,21 +3106,21 @@ Stage.prototype.dispatchEvent = function(e)
 		if(outEvent) target.dispatchEvent({type:outEvent});
 		this._eventTarget = null;
 	}
-	
+
 	//派发事件到目标对象
 	if(obj!= null && obj.eventEnabled && e.type != "mouseout")
 	{
 		e.eventTarget = target = this._eventTarget = obj;
 		obj.dispatchEvent(e);
 	}
-	
+
 	//设置光标状态
 	if(!Quark.supportTouch)
 	{
 		var cursor = (target && target.useHandCursor && target.eventEnabled) ? "pointer" : "";
 		this.context.canvas.style.cursor = cursor;
 	}
-	
+
 	if(leave || e.type != "mouseout") Stage.superClass.dispatchEvent.call(this, e);
 };
 
@@ -3143,18 +3148,18 @@ Stage.prototype.updatePosition = function()
  * @argument props 参数JSON格式为：{image:imgElem, rect:[0,0,100,100]} 其中image是Image对象，rect指定Image区域。
  */
 var Bitmap = Quark.Bitmap = function(props)
-{	
+{
 	this.image = null;
 	this.rectX = 0; //ready-only
 	this.rectY = 0; //ready-only
 	this.rectWidth = 0; //ready-only
 	this.rectHeight = 0; //ready-only
-	
+
 	props = props || {};
 	Bitmap.superClass.constructor.call(this, props);
 	this.id = props.id || Quark.UIDUtil.createUID("Bitmap");
-	
-	this.setRect(props.rect || [0, 0, this.image.width, this.image.height]);	
+
+	this.setRect(props.rect || [0, 0, this.image.width, this.image.height]);
 	this.setDrawable(this.image);
 	this._stateList.push("rectX", "rectY", "rectWidth", "rectHeight");
 };
@@ -3167,8 +3172,10 @@ Bitmap.prototype.setRect = function(rect)
 {
 	this.rectX = rect[0];
 	this.rectY = rect[1];
-	this.rectWidth = this.width = rect[2];
-	this.rectHeight = this.height = rect[3];
+	this.rectWidth  = rect[2];
+	this.rectHeight  = rect[3];
+	this.width = this.width || rect[2];
+	this.height = this.height || rect[3];
 };
 
 /**
@@ -3192,17 +3199,17 @@ Bitmap.prototype.render = function(context)
  * @class MovieClip影片剪辑类，表示一组动画片段。MovieClip是由Image对象的若干矩形区域组成的集合序列，并按照一定规则顺序播放。帧frame的定义格式为：{rect:*required*, label:"", interval:0, stop:0, jump:-1}。
  */
 var MovieClip = Quark.MovieClip = function(props)
-{	
-	this.interval = 0;	
+{
+	this.interval = 0;
 	this.paused = false;
 	this.useFrames = false;
 	this.currentFrame = 0; //read-only
-	
+
 	this._frames = [];
-	this._frameLabels = {};	
+	this._frameLabels = {};
 	this._frameDisObj = null;
 	this._displayedCount = 0;
-	
+
 	props = props || {};
 	MovieClip.superClass.constructor.call(this, props);
 	this.id = props.id || Quark.UIDUtil.createUID("MovieClip");
@@ -3234,7 +3241,7 @@ MovieClip.prototype.setFrame = function(frame, index)
 {
 	if(index == undefined || index > this._frames.length) index = this._frames.length;
 	else if(index < 0) index = 0;
-	
+
 	this._frames[index] = frame;
 	if(frame.label) this._frameLabels[frame.label] = frame;
 	if(frame.interval == undefined) frame.interval = this.interval;
@@ -3270,7 +3277,7 @@ MovieClip.prototype.stop = function()
  * 跳转到指定位置或标签的帧，并停止播放动画序列。
  */
 MovieClip.prototype.gotoAndStop = function(indexOrLabel)
-{	
+{
 	this.currentFrame = this.getFrameIndex(indexOrLabel);
 	this.paused = true;
 };
@@ -3290,7 +3297,7 @@ MovieClip.prototype.gotoAndPlay = function(indexOrLabel)
 MovieClip.prototype.getFrameIndex = function(indexOrLabel)
 {
 	if(typeof(indexOrLabel) == "number") return indexOrLabel;
-	var frame = this._frameLabels[indexOrLabel], frames = this._frames;	
+	var frame = this._frameLabels[indexOrLabel], frames = this._frames;
 	for(var i = 0; i < frames.length; i++)
 	{
 		if(frame == frames[i]) return i;
@@ -3302,23 +3309,23 @@ MovieClip.prototype.getFrameIndex = function(indexOrLabel)
  * 播放动画序列的下一帧。
  */
 MovieClip.prototype.nextFrame = function(displayedDelta)
-{	
+{
 	var frame = this._frames[this.currentFrame];
-	
+
 	if(frame.interval > 0)
 	{
 		var count = this._displayedCount + displayedDelta;
 		this._displayedCount = frame.interval > count ? count : 0;
 	}
-	
-	if(frame.jump >= 0 || typeof(frame.jump) == "string") 
+
+	if(frame.jump >= 0 || typeof(frame.jump) == "string")
 	{
 		if(this._displayedCount == 0 || !frame.interval)
 		{
 			return this.currentFrame = this.getFrameIndex(frame.jump);
 		}
 	}
-	
+
 	if(frame.interval > 0 && this._displayedCount > 0) return this.currentFrame;
 	else if(this.currentFrame >= this._frames.length - 1) return this.currentFrame = 0;
 	else return ++this.currentFrame;
@@ -3343,13 +3350,13 @@ MovieClip.prototype._update = function(timeInfo)
 		this.stop();
 		return;
 	}
-	if(!this.paused) 
+	if(!this.paused)
 	{
 		var delta = this.useFrames ? 1 : timeInfo && timeInfo.deltaTime;
 		this.nextFrame(delta);
 	}
 	this.setRect(frame.rect);
-	
+
 	MovieClip.superClass._update.call(this, timeInfo);
 };
 
@@ -3379,7 +3386,7 @@ var Button = Quark.Button = function(props)
 {
 	this.state = Button.UP;
 	this.enabled = true;
-    
+
 	props = props || {};
 	Button.superClass.constructor.call(this, props);
 	this.id = props.id || Quark.UIDUtil.createUID("Button");
@@ -3464,7 +3471,7 @@ Button.prototype.setDisabledState = function(disabledState)
 Button.prototype.setEnabled = function(enabled)
 {
 	if(this.enabled == enabled) return this;
-	this.eventEnabled = this.enabled = enabled;	 
+	this.eventEnabled = this.enabled = enabled;
 	if(!enabled)
 	{
 		if(this.disabledState) this._skin.gotoAndStop(Button.DISABLED);
@@ -3506,11 +3513,11 @@ Button.prototype.changeState = function(state)
 Button.prototype.dispatchEvent = function(e)
 {
 	if(!this.enabled) return;
-	
+
 	switch(e.type)
 	{
 		case "mousemove":
-			if(this.overState) this.changeState(Button.OVER);		
+			if(this.overState) this.changeState(Button.OVER);
 			break;
 		case "mousedown":
 		case "touchstart":
@@ -3550,26 +3557,26 @@ Button.prototype.setDrawable = function(drawable)
  * @name Graphics
  * @augments DisplayObject
  * @class The Graphics class contains a set of methods that you can use to create a vector shape.
- */ 
+ */
 var Graphics = Quark.Graphics = function(props)
-{	
+{
 	this.lineWidth = 1;
 	this.strokeStyle = "0";
 	this.lineAlpha = 1;
 	this.lineCap = null; //"butt", "round", "square"
 	this.lineJoin = null; //"miter", "round", "bevel"
 	this.miterLimit = 10;
-	
+
 	this.hasStroke = false;
 	this.hasFill = false;
-	
+
 	this.fillStyle = "0";
 	this.fillAlpha = 1;
-	
+
 	props = props || {};
 	Graphics.superClass.constructor.call(this, props);
 	this.id = Quark.UIDUtil.createUID("Graphics");
-	
+
 	this._actions = [];
 	this._cache = null;
 };
@@ -3579,7 +3586,7 @@ Quark.inherit(Graphics, Quark.DisplayObject);
  * Specifies a line style that Canvas uses for subsequent calls to other Graphics methods (such as lineTo() or drawCircle()) for the object.
  */
 Graphics.prototype.lineStyle = function(thickness, lineColor, alpha, lineCap, lineJoin, miterLimit)
-{	
+{
 	this._addAction(["lineWidth", (this.lineWidth = thickness || 1)]);
 	this._addAction(["strokeStyle", (this.strokeStyle = lineColor || "0")]);
 	this._addAction(["lineAlpha", (this.lineAlpha = alpha || 1)]);
@@ -3633,12 +3640,12 @@ Graphics.prototype.beginRadialGradientFill = function(x0, y0, r0, x1, y1, r1, co
 	for (var i = 0, len = colors.length; i < len; i++)
 	{
 		gradient.addColorStop(ratios[i], colors[i]);
-	}	
+	}
 	return this._addAction(["fillStyle", (this.fillStyle = gradient)]);
 };
 
 /**
- * Fills a drawing area with a bitmap image. 
+ * Fills a drawing area with a bitmap image.
  * The repetition parameter must be one of the following values: repeat, repeat-x, repeat-y, no-repeat.
  */
 Graphics.prototype.beginBitmapFill = function(image, repetition)
@@ -3710,11 +3717,11 @@ Graphics.prototype.drawCircle = function(x, y, radius)
 Graphics.prototype.drawEllipse = function(x, y, width, height)
 {
 	if(width == height) return this.drawCircle(x, y, width);
-	
+
 	var w = width / 2, h = height / 2, C = 0.5522847498307933, cx = C * w, cy = C * h;
 	x = x + w;
 	y = y + h;
-	
+
 	this._addAction(["moveTo", x + w, y]);
 	this._addAction(["bezierCurveTo", x + w, y - cy, x + cx, y - h, x, y - h]);
 	this._addAction(["bezierCurveTo", x - cx, y - h, x - w, y - cy, x - w, y]);
@@ -3724,8 +3731,8 @@ Graphics.prototype.drawEllipse = function(x, y, width, height)
 };
 
 /**
- * Draws a path from SVG path data. 
- * For example: 
+ * Draws a path from SVG path data.
+ * For example:
  * var path = "M250 150 L150 350 L350 350 Z";
  * var shape = new Quark.Graphics({width:500, height:500});
  * shape.drawSVGPath(path).beginFill("#0ff").endFill();
@@ -3733,7 +3740,7 @@ Graphics.prototype.drawEllipse = function(x, y, width, height)
 Graphics.prototype.drawSVGPath = function(pathData)
 {
 	var path = pathData.split(/,| (?=[a-zA-Z])/);
-	
+
 	this._addAction(["beginPath"]);
 	for(var i = 0, len = path.length; i < len; i++)
 	{
@@ -3766,14 +3773,14 @@ Graphics.prototype.drawSVGPath = function(pathData)
  * @private
  */
 Graphics.prototype._draw = function(context)
-{	
+{
 	context.beginPath();
 	for(var i = 0, len = this._actions.length; i < len; i++)
 	{
-		var action = this._actions[i], 
-			f = action[0], 
+		var action = this._actions[i],
+			f = action[0],
 			args = action.length > 1 ? action.slice(1) : null;
-		
+
 		if(typeof(context[f]) == "function") context[f].apply(context, args);
 		else context[f] = action[1];
 	}
@@ -3797,7 +3804,7 @@ Graphics.prototype.cache = function(toImage)
 {
 	var canvas = Quark.createDOM("canvas", {width:this.width, height:this.height});
 	this._draw(canvas.getContext("2d"));
-	
+
 	this._cache = canvas;
 	if(toImage) this._cache = this.toImage();
 	return this._cache;
@@ -3818,7 +3825,7 @@ Graphics.prototype.toImage = function(type)
 {
 	var cache = this._cache || this.cache(true);
 	if(cache instanceof HTMLImageElement) return cache;
-	
+
 	var img = new Image();
 	img.src = cache.toDataURL(type || "image/png");
 	img.width = this.width;
@@ -3833,7 +3840,7 @@ Graphics.prototype.clear = function()
 {
 	this._actions.length = 0;
 	this._cache = null;
-	
+
 	this.lineWidth = 1;
 	this.strokeStyle = "0";
 	this.lineAlpha = 1;
@@ -3841,12 +3848,12 @@ Graphics.prototype.clear = function()
 	this.lineJoin = null;
 	this.miterLimit = 10;
 	this.hasStroke = false;
-	
+
 	this.fillStyle = "0";
 	this.fillAlpha = 1;
 };
 
-/** 
+/**
  * Adds a drawing action. For internal use.
  * @private
  */
@@ -3868,7 +3875,7 @@ Graphics._getContext = function()
 	};
 	return ctx;
 };
-	
+
 })();
 
 
@@ -3991,6 +3998,7 @@ Text.prototype._drawTextLine = function(context, text, y)
 	};
 	if(this.outline) context.strokeText(text, x, y, this.maxWidth);
 	else context.fillText(text, x, y, this.maxWidth);
+	// console.log(this.textAlign,x,y);
 };
 
 /**
@@ -4055,7 +4063,7 @@ Text.getFontMetrics = function(font)
 	metrics.ascent = baseline.offsetTop + baseline.offsetHeight;
 	//the descent value is the length from the baseline to the bottom of the line height.
 	metrics.descent = metrics.height - metrics.ascent;
-	
+
 	document.body.removeChild(elem);
 	return metrics;
 };

@@ -9,17 +9,17 @@
  * @argument props 参数JSON格式为：{image:imgElem, rect:[0,0,100,100]} 其中image是Image对象，rect指定Image区域。
  */
 var Bitmap = Quark.Bitmap = function(props)
-{	
+{
 	this.image = null;
 	this.rectX = 0; //ready-only
 	this.rectY = 0; //ready-only
 	this.rectWidth = 0; //ready-only
 	this.rectHeight = 0; //ready-only
-	
+
 	props = props || {};
 	Bitmap.superClass.constructor.call(this, props);
 	this.id = props.id || Quark.UIDUtil.createUID("Bitmap");
-	
+
 	this.image && this.setRect(props.rect || [0, 0, this.image.width, this.image.height]);
 	this.setDrawable(this.image);
 	this._stateList.push("rectX", "rectY", "rectWidth", "rectHeight");
@@ -33,8 +33,10 @@ Bitmap.prototype.setRect = function(rect)
 {
 	this.rectX = rect[0];
 	this.rectY = rect[1];
-	this.rectWidth = this.width = rect[2];
-	this.rectHeight = this.height = rect[3];
+	this.rectWidth  = rect[2];
+	this.rectHeight  = rect[3];
+	this.width = this.width || rect[2];
+	this.height = this.height || rect[3];
 };
 
 /**
