@@ -1,5 +1,5 @@
 /*
-Quark 1.0.0 (build 117)
+Quark 1.0.0 (build 119)
 Licensed under the MIT License.
 http://github.com/quark-dev-team/quarkjs
 */
@@ -8,19 +8,23 @@ http://github.com/quark-dev-team/quarkjs
 (function(win){
 
 /**
+ * Quark不是构造函数。
  * @name Quark
- * @class QuarkJS框架的全局对象，也是框架内部所有类的命名空间。
+ * @class Quark是QuarkJS框架的全局对象，也是框架内部所有类的全局命名空间。在全局Q未被占用的情况下，也可以使用其缩写Q。
  */
-var Quark = win.Quark = win.Quark ||
+var Quark = win.Quark = win.Quark || 
 {
 	global: win
 };
 
+
+var emptyConstructor = function() {};
 /**
  * Quark框架的继承方法。
+ * @param {Function} childClass 子类。
+ * @param {Function} parentClass 父类。
  */
-var emptyConstructor = function() {};
-Quark.inherit = function(childClass, parentClass)
+Quark.inherit = function(childClass, parentClass) 
 {
   	emptyConstructor.prototype = parentClass.prototype;
   	childClass.superClass = parentClass.prototype;
@@ -31,6 +35,10 @@ Quark.inherit = function(childClass, parentClass)
 
 /**
  * 把props参数指定的属性或方法复制到obj对象上。
+ * @param {Object} obj Object对象。
+ * @param {Object} props 包含要复制到obj对象上的属性或方法的对象。
+ * @param {Boolean} strict 指定是否采用严格模式复制。默认为false。
+ * @return {Object} 复制后的obj对象。
  */
 Quark.merge = function(obj, props, strict)
 {
@@ -43,19 +51,22 @@ Quark.merge = function(obj, props, strict)
 
 /**
  * 改变func函数的作用域scope，即this的指向。
+ * @param {Function} func 要改变函数作用域的函数。
+ * @param {Object} self 指定func函数的作用对象。
+ * @return {Function} 一个作用域为参数self的功能与func相同的新函数。
  */
 Quark.delegate = function(func, self)
 {
 	var context = self || win;
-  	if (arguments.length > 2)
+  	if (arguments.length > 2) 
   	{
-    	var args = Array.prototype.slice.call(arguments, 2);
-    	return function()
+    	var args = Array.prototype.slice.call(arguments, 2);    	
+    	return function() 
     	{
       		var newArgs = Array.prototype.concat.apply(args, arguments);
       		return func.apply(context, newArgs);
     	};
-  	}else
+  	}else 
   	{
     	return function() {return func.apply(context, arguments);};
   	}
@@ -63,6 +74,8 @@ Quark.delegate = function(func, self)
 
 /**
  * 根据id获得DOM对象。
+ * @param {String} id DOM对象的id。
+ * @return {HTMLElement} DOM对象。
  */
 Quark.getDOM = function(id)
 {
@@ -71,11 +84,14 @@ Quark.getDOM = function(id)
 
 /**
  * 创建一个指定类型type和属性props的DOM对象。
+ * @param {String} type 指定DOM的类型。比如canvas，div等。
+ * @param {Object} props 指定生成的DOM的属性对象。
+ * @return {HTMLElement} 新生成的DOM对象。
  */
 Quark.createDOM = function(type, props)
 {
 	var dom = document.createElement(type);
-	for(var p in props)
+	for(var p in props) 
 	{
 		var val = props[p];
 		if(p == "style")
@@ -90,7 +106,9 @@ Quark.createDOM = function(type, props)
 };
 
 /**
- * 根据限定名称返回一个命名空间（从global开始）。如：Quark.use('quark.test')。
+ * 根据限定名称返回一个命名空间（从global开始）。如：Quark.use('Quark.test')。
+ * @param {String} 指定新的命名空间的名称。如Quark.test等。
+ * @return {Object} 参数name指定的命名空间对象。
  */
 Quark.use = function(name)
 {
@@ -102,15 +120,15 @@ Quark.use = function(name)
 	}
 	return obj;
 };
-
+		
 /**
  * 浏览器的特性的简单检测，并非精确判断。
  */
 function detectBrowser(ns)
 {
-	var ua = ns.ua = navigator.userAgent;
+	var ua = ns.ua = navigator.userAgent;		
 	ns.isWebKit = (/webkit/i).test(ua);
-	ns.isMozilla = (/mozilla/i).test(ua);
+	ns.isMozilla = (/mozilla/i).test(ua);	
 	ns.isIE = (/msie/i).test(ua);
 	ns.isFirefox = (/firefox/i).test(ua);
 	ns.isChrome = (/chrome/i).test(ua);
@@ -133,7 +151,9 @@ function detectBrowser(ns)
 detectBrowser(Quark);
 
 /**
- * 获取某个DOM元素在页面中的位置偏移量。
+ * 获取某个DOM元素在页面中的位置偏移量。格式为:{left: leftValue, top: topValue}。
+ * @param {HTMLElement} elem DOM元素。
+ * @return {Object} 指定DOM元素在页面中的位置偏移。格式为:{left: leftValue, top: topValue}。
  */
 Quark.getElementOffset = function(elem)
 {
@@ -148,7 +168,9 @@ Quark.getElementOffset = function(elem)
 
 /**
  * 创建一个可渲染的DOM，可指定tagName，如canvas或div。
- * disObj是一个DisplayObject或类似的对象，imageObj指定渲染的image及相关设置，如绘制区域rect。
+ * @param {Object} disObj 一个DisplayObject或类似的对象。
+ * @param {Object} imageObj 指定渲染的image及相关设置，如绘制区域rect。
+ * @return {HTMLElement} 新创建的DOM对象。
  */
 Quark.createDOMDrawable = function(disObj, imageObj)
 {
@@ -172,10 +194,10 @@ Quark.createDOMDrawable = function(disObj, imageObj)
 		if(img)
 		{
 			var ctx = elem.getContext("2d");
-			var rect = imageObj.rect || [0, 0, w, h];
-			ctx.drawImage(img, rect[0], rect[1], rect[2], rect[3],
-						 (disObj.x || 0), (disObj.y || 0),
-						 (disObj.width || rect[2]),
+			var rect = imageObj.rect || [0, 0, w, h];		
+			ctx.drawImage(img, rect[0], rect[1], rect[2], rect[3], 
+						 (disObj.x || 0), (disObj.y || 0), 
+						 (disObj.width || rect[2]), 
 						 (disObj.height || rect[3]));
 		}
 	}else
@@ -193,26 +215,35 @@ Quark.createDOMDrawable = function(disObj, imageObj)
 };
 
 /**
- * Constants
+ * 角度转弧度常量。
  */
 Quark.DEG_TO_RAD = Math.PI / 180;
+
+/**
+ * 弧度转角度常量。
+ */
 Quark.RAD_TO_DEG = 180 / Math.PI;
 
 /**
  * 检测显示对象obj是否与点x，y发生了碰撞。
+ * @param {DisplayObject} obj 要检测的显示对象。
+ * @param {Number} x 指定碰撞点的x坐标。
+ * @param {Number} y 指定碰撞点的y坐标。
+ * @param {Boolean} usePolyCollision 指定是否采用多边形碰撞。默认为false。
+ * @return {Number} 如果点x，y在对象obj内为1，在外为-1，在边上为0。
  */
 Quark.hitTestPoint = function(obj, x, y, usePolyCollision)
 {
 	var b = obj.getBounds(), len = b.length;
 	var hit = x >= b.x && x <= b.x + b.width && y >= b.y && y <= b.y + b.height;
-
+	
 	if(hit && usePolyCollision)
 	{
-		var cross = 0, onBorder = false, minX, maxX, minY, maxY;
+		var cross = 0, onBorder = false, minX, maxX, minY, maxY;		
 		for(var i = 0; i < len; i++)
 		{
-			var p1 = b[i], p2 = b[(i+1)%len];
-
+			var p1 = b[i], p2 = b[(i+1)%len];			
+			
 			if(p1.y == p2.y && y == p1.y)
 			{
 				p1.x > p2.x ? (minX = p2.x, maxX = p1.x) : (minX = p1.x, maxX = p2.x);
@@ -222,15 +253,15 @@ Quark.hitTestPoint = function(obj, x, y, usePolyCollision)
 					continue;
 				}
 			}
-
+			
 			p1.y > p2.y ? (minY = p2.y, maxY = p1.y) : (minY = p1.y, maxY = p2.y);
 			if(y < minY || y > maxY) continue;
-
+			
 			var nx = (y - p1.y)*(p2.x - p1.x) / (p2.y - p1.y) + p1.x;
 			if(nx > x) cross++;
-			else if(nx == x) onBorder = true;
+			else if(nx == x) onBorder = true;			
 		}
-
+		
 		if(onBorder) return 0;
 		else if(cross % 2 == 1) return 1;
 		return -1;
@@ -240,13 +271,17 @@ Quark.hitTestPoint = function(obj, x, y, usePolyCollision)
 
 /**
  * 检测显示对象obj1和obj2是否发生了碰撞。
+ * @param {DisplayObject} obj1 要检测的显示对象。
+ * @param {DisplayObject} obj2 要检测的显示对象。
+ * @param {Boolean} usePolyCollision 指定是否采用多边形碰撞。默认为false。
+ * @return {Boolean} 发生碰撞为true，否则为false。
  */
 Quark.hitTestObject = function(obj1, obj2, usePolyCollision)
 {
 	var b1 = obj1.getBounds(), b2 = obj2.getBounds();
-	var hit = b1.x <= b2.x + b2.width && b2.x <= b1.x + b1.width &&
+	var hit = b1.x <= b2.x + b2.width && b2.x <= b1.x + b1.width && 
 				   b1.y <= b2.y + b2.height && b2.y <= b1.y + b1.height;
-
+	
 	if(hit && usePolyCollision)
 	{
 		hit = Quark.polygonCollision(b2, b2);
@@ -257,10 +292,13 @@ Quark.hitTestObject = function(obj1, obj2, usePolyCollision)
 
 /**
  * 采用Separating Axis Theorem(SAT)的多边形碰撞检测方法。
- * poly1,poly2是多边形顶点组成的数组。如[{x:0, y:0}, {x:10, y:0}, {x:10, y:10}, {x:0, y:10}]
+ * @private
+ * @param {Array} poly1 多边形顶点组成的数组。格式如：[{x:0, y:0}, {x:10, y:0}, {x:10, y:10}, {x:0, y:10}]。
+ * @param {Array} poly2 多边形顶点组成的数组。格式与参数poly1相同。
+ * @param {Boolean} 发生碰撞为true，否则为false。 
  */
 Quark.polygonCollision = function(poly1, poly2)
-{
+{	
 	var result = doSATCheck(poly1, poly2, {overlap:-Infinity, normal:{x:0, y:0}});
 	if(result) return doSATCheck(poly2, poly1, result);
 	return false;
@@ -269,35 +307,35 @@ Quark.polygonCollision = function(poly1, poly2)
 function doSATCheck(poly1, poly2, result)
 {
 	var len1 = poly1.length, len2 = poly2.length, currentPoint, nextPoint, distance, min1, max1, min2, max2, dot, overlap, normal = {x:0, y:0};
-
+	
 	for(var i = 0; i < len1; i++)
 	{
 		currentPoint = poly1[i];
 		nextPoint = poly1[(i < len1-1 ? i+1 : 0)];
-
+		
 		normal.x = currentPoint.y - nextPoint.y;
 		normal.y = nextPoint.x - currentPoint.x;
-
+		
 		distance = Math.sqrt(normal.x * normal.x + normal.y * normal.y);
 		normal.x /= distance;
 		normal.y /= distance;
-
-		min1 = max1 = poly1[0].x * normal.x + poly1[0].y * normal.y;
+		
+		min1 = max1 = poly1[0].x * normal.x + poly1[0].y * normal.y;		
 		for(var j = 1; j < len1; j++)
 		{
 			dot = poly1[j].x * normal.x + poly1[j].y * normal.y;
 			if(dot > max1) max1 = dot;
 			else if(dot < min1) min1 = dot;
 		}
-
-		min2 = max2 = poly2[0].x * normal.x + poly2[0].y * normal.y;
+		
+		min2 = max2 = poly2[0].x * normal.x + poly2[0].y * normal.y;		
 		for(j = 1; j < len2; j++)
 		{
 			dot = poly2[j].x * normal.x + poly2[j].y * normal.y;
 			if(dot > max2) max2 = dot;
 			else if(dot < min2) min2 = dot;
 		}
-
+		
 		if(min1 < min2)
 		{
 			overlap = min2 - max1;
@@ -307,7 +345,7 @@ function doSATCheck(poly1, poly2, result)
 		{
 			overlap = min1 - max2;
 		}
-
+		
 		if(overlap >= 0)
 		{
 			return false;
@@ -318,12 +356,13 @@ function doSATCheck(poly1, poly2, result)
 			result.normal.y = normal.y;
 		}
 	}
-
+	
 	return result;
 };
 
 /**
  * 返回Quark的字符串表示形式。
+ * @return {String} Quark的字符串表示形式。
  */
 Quark.toString = function()
 {
@@ -344,7 +383,7 @@ Quark.trace = function()
  */
 if(win.Q == undefined) win.Q = Quark;
 if(win.trace == undefined) win.trace = Quark.trace;
-
+	
 })(window);
 
 
@@ -366,7 +405,7 @@ Matrix.prototype.concat = function(mtx)
 	var a = this.a;
 	var c = this.c;
 	var tx = this.tx;
-
+	
 	this.a = a * mtx.a + this.b * mtx.c;
 	this.b = a * mtx.b + this.b * mtx.d;
 	this.c = c * mtx.a + this.d * mtx.c;
@@ -380,11 +419,11 @@ Matrix.prototype.rotate = function(angle)
 {
 	var cos = Math.cos(angle);
 	var sin = Math.sin(angle);
-
+	
 	var a = this.a;
 	var c = this.c;
 	var tx = this.tx;
-
+	
 	this.a = a * cos - this.b * sin;
 	this.b = a * sin + this.b * cos;
 	this.c = c * cos - this.d * sin;
@@ -425,7 +464,7 @@ Matrix.prototype.invert = function()
 	var d = this.d;
 	var tx = this.tx;
 	var i = a * d - b * c;
-
+	
 	this.a = d / i;
 	this.b = -b / i;
 	this.c = -c / i;
@@ -502,12 +541,12 @@ Rectangle.prototype.union = function(rect, returnNew)
 {
  	var right = Math.max(this.x + this.width, rect.x + rect.width);
   	var bottom = Math.max(this.y + this.height, rect.y + rect.height);
-
+	
   	var x = Math.min(this.x, rect.x);
  	var y = Math.min(this.y, rect.y);
   	var width = right - x;
   	var height = bottom - y;
-  	if(returnNew)
+  	if(returnNew) 
   	{
   		return new Rectangle(x, y, width, height);
   	}else
@@ -526,12 +565,12 @@ Rectangle.prototype.containsPoint = function(x, y)
 
 Rectangle.prototype.clone = function()
 {
-	return new Rectangle(this.x, this.y, this.width, this.height);
+	return new Rectangle(this.x, this.y, this.width, this.height);	
 };
 
 Rectangle.prototype.toString = function()
 {
-	return "(x=" + this.x + ", y=" + this.y + ", width=" + this.width + ", height=" + this.height + ")";
+	return "(x=" + this.x + ", y=" + this.y + ", width=" + this.width + ", height=" + this.height + ")";	
 };
 
 })();
@@ -641,7 +680,7 @@ Quark.KEY = {
 	F11 : 122,
 	F12 : 123
 };
-
+	
 })();
 
 
@@ -649,7 +688,7 @@ Quark.KEY = {
 (function(){
 
 /**
- * Constructor.
+ * 构造函数.
  * @name EventManager
  * @class EventManager是一个简单的系统事件管理器。
  */
@@ -688,16 +727,16 @@ EventManager.prototype.register = function(target, events, callback, preventDefa
 {
 	if(callback == null || (typeof callback == "function")) callback = {host:null, func:callback};
 	var params = {prevent:preventDefault, stop:stopPropagation};
-
+	
 	var me = this, handler = function(e){me._onEvent(e, params, callback);};
-
+	
 	for(var i = 0; i < events.length; i++)
 	{
 		var type = events[i], list = this._evtHandlers[type] || (this._evtHandlers[type] = []);
 		for(var j = 0, has = false; j < list.length; j++)
 		{
 			var li = list[j];
-			if(li.target == target && li.callback.func == callback.func)
+			if(li.target == target && li.callback.func == callback.func) 
 			{
 				trace("duplicate callback");
 				has = true;
@@ -740,25 +779,25 @@ EventManager.prototype.unregister = function(target, events, callback)
  * @private
  */
 EventManager.prototype._onEvent = function(e, params, callback)
-{
+{	
 	//correct touch events
     var ne = e, type = e.type, isTouch = e.type.indexOf("touch") == 0;
     if(isTouch)
     {
-        ne = (e.touches && e.touches.length > 0) ? e.touches[0] :
+        ne = (e.touches && e.touches.length > 0) ? e.touches[0] : 
             (e.changedTouches && e.changedTouches.length > 0) ? e.changedTouches[0] : e;
         ne.type = type;
     }
-
+	
 	if(type == "keydown" || type == "keyup" || type == "keypress")
 	{
 		this.keyState[e.keyCode] = type;
 	}
-
+	
 	//e.eventTime = Date.now();
-
+	
 	if(callback.func != null) callback.func.call(callback.host, ne);
-
+	
 	EventManager.stop(e, !params.prevent, !params.stop);
 };
 
@@ -777,7 +816,7 @@ EventManager.stop = function(e, continueDefault, continuePropagation)
 		if(e.stopImmediatePropagation) e.stopImmediatePropagation();
 	}
 };
-
+	
 })();
 
 
@@ -785,7 +824,7 @@ EventManager.stop = function(e, continueDefault, continuePropagation)
 (function(){
 
 /**
- * Constructor.
+ * 构造函数.
  * @name EventDispatcher
  * @class EventDispatcher类是可调度事件的类的基类，它允许显示列表上的任何对象都是一个事件目标。
  */
@@ -802,7 +841,7 @@ EventDispatcher.prototype.addEventListener = function(type, listener)
 {
 	var map = this._eventMap[type];
     if(map == null) map = this._eventMap[type] = [];
-
+    
     if(map.indexOf(listener) == -1)
     {
     	map.push(listener);
@@ -852,7 +891,7 @@ EventDispatcher.prototype.removeEventListenerByType = function(type)
  * 删除所有事件侦听器。
  */
 EventDispatcher.prototype.removeAllEventListeners = function()
-{
+{	
 	this._eventMap = {};
 };
 
@@ -862,7 +901,7 @@ EventDispatcher.prototype.removeAllEventListeners = function()
 EventDispatcher.prototype.dispatchEvent = function(event)
 {
 	var map = this._eventMap[event.type];
-	if(map == null) return false;
+	if(map == null) return false;	
 	if(!event.target) event.target = this;
     map = map.slice();
 
@@ -898,14 +937,16 @@ EventDispatcher.prototype.fire = EventDispatcher.prototype.dispatchEvent;
 (function(){
 
 /**
- * Constructor.
+ * 构造函数.
  * @name Context
  * @class Context是Quark框架中显示对象结构的上下文，实现显示对象结构的渲染。此类为抽象类。
+ * @param {Object} props 一个对象。包含以下属性：
+ * <p>canvas - 渲染上下文所对应的画布。</p>
  */
 var Context = Quark.Context = function(props)
-{
+{	
 	if(props.canvas == null) throw "Quark.Context Error: canvas is required.";
-
+	
 	this.canvas = null;
 	Quark.merge(this, props);
 };
@@ -932,8 +973,9 @@ Context.prototype.transform = function(){ };
 
 /**
  * 从画布中删除显示对象，需要子类来实现。
+ * @param {DisplayObject} target 要删除的显示对象。
  */
-Context.prototype.remove = function(obj){ };
+Context.prototype.remove = function(target){ };
 
 })();
 
@@ -942,10 +984,12 @@ Context.prototype.remove = function(obj){ };
 (function(){
 
 /**
- * Constructor.
+ * 构造函数.
  * @name CanvasContext
  * @augments Context
  * @class CanvasContext是Canvas渲染上下文，将显示对象渲染到指定的Canvas上。
+ * @param {Object} props 一个对象。包含以下属性：
+ * <p>canvas - 渲染上下文所对应的canvas，HTMLCanvasElement对象。</p>
  */
 var CanvasContext = Quark.CanvasContext = function(props)
 {
@@ -963,13 +1007,14 @@ CanvasContext.prototype.startDraw = function()
 };
 
 /**
- * 绘制指定对象到Canvas上。
+ * 绘制指定的显示对象到Canvas上。
+ * @param {DisplayObject} target 要绘制的显示对象。
  */
 CanvasContext.prototype.draw = function(target)
 {
 	//ignore children drawing if the parent has a mask.
 	if(target.parent != null && target.parent.mask != null) return;
-
+	
 	if(target.mask != null)
 	{
 		//we implements the mask function by using 'source-in' composite operation.
@@ -982,7 +1027,7 @@ CanvasContext.prototype.draw = function(target)
 		context.startDraw();
 		target.mask._render(context);
 		ctx.globalCompositeOperation = 'source-in';
-
+		
 		//this is a trick for ignoring mask drawing during object drawing.
 		var mask = target.mask;
 		target.mask = null;
@@ -1015,7 +1060,7 @@ CanvasContext.prototype.draw = function(target)
 		if(img != null)
 		{
 			arguments[0] = img;
-			this.context.drawImage.apply(this.context, arguments);
+			this.context.drawImage.apply(this.context, arguments);	
 		}
 	}
 };
@@ -1025,16 +1070,17 @@ CanvasContext.prototype.draw = function(target)
  */
 CanvasContext.prototype.endDraw = function()
 {
-	this.context.restore();
+	this.context.restore();	
 };
 
 /**
  * 对指定的显示对象进行context属性设置或变换。
+ * @param {DisplayObject} target 要进行属性设置或变换的显示对象。
  */
 CanvasContext.prototype.transform = function(target)
 {
 	var ctx = this.context;
-
+	
 	if(target instanceof Q.Stage)
 	{
 		//Use style for stage scaling
@@ -1055,12 +1101,16 @@ CanvasContext.prototype.transform = function(target)
 		if(target.scaleX != 1 || target.scaleY != 1) ctx.scale(target.scaleX, target.scaleY);
 		if(target.regX != 0 || target.regY != 0) ctx.translate(-target.regX, -target.regY);
 	}
-
+	
 	if(target.alpha > 0) ctx.globalAlpha *= target.alpha;
 };
 
 /**
  * 清除画布上的指定区域内容。
+ * @param {Number} x 指定区域的x轴坐标。
+ * @param {Number} y 指定区域的y轴坐标。
+ * @param {Number} width 指定区域的宽度。
+ * @param {Number} height 指定区域的高度。
  */
 CanvasContext.prototype.clear = function(x, y, width, height)
 {
@@ -1082,15 +1132,15 @@ var supportTransform = testElem.style[Quark.cssPrefix + "Transform"] != undefine
 var supportTransform3D = testElem.style[Quark.cssPrefix + "Perspective"] != undefined;
 var docElem = document.documentElement;
 if(supportTransform3D && 'webkitPerspective' in docElem.style)
-{
+{		
 	testElem.id = 'test3d';
 	var st = document.createElement('style');
 	st.textContent = '@media (-webkit-transform-3d){#test3d{height:3px}}';
 	document.head.appendChild(st);
 	docElem.appendChild(testElem);
-
+	
 	supportTransform3D = testElem.offsetHeight === 3;
-
+	
 	st.parentNode.removeChild(st);
 	testElem.parentNode.removeChild(testElem);
 };
@@ -1103,10 +1153,12 @@ if(!supportTransform)
 }
 
 /**
- * Constructor.
+ * 构造函数.
  * @name DOMContext
  * @augments Context
  * @class DOMContext是DOM渲染上下文，将显示对象以dom方式渲染到舞台上。
+ * @param {Object} props 一个对象。包含以下属性：
+ * <p>canvas - 渲染上下文所对应的画布，HTMLDivElement对象。</p>
  */
 var DOMContext = Quark.DOMContext = function(props)
 {
@@ -1116,6 +1168,7 @@ Quark.inherit(DOMContext, Quark.Context);
 
 /**
  * 绘制指定对象的DOM到舞台上。
+ * @param {DisplayObject} target 要绘制的显示对象。
  */
 DOMContext.prototype.draw = function(target)
 {
@@ -1127,9 +1180,8 @@ DOMContext.prototype.draw = function(target)
 		{
 			var parentDOM = parent.getDrawable(this);
 			if(targetDOM.parentNode != parentDOM) parentDOM.appendChild(targetDOM);
-			if(parentDOM.parentNode == null && parent instanceof Quark.Stage)
+			if(parentDOM.parentNode == null && parent instanceof Quark.Stage) 
 			{
-				parentDOM.style.pointerEvents = parentDOM.style.pointerEvents || "none";
 				this.canvas.appendChild(parentDOM);
 				parent._addedToDOM = true;
 			}
@@ -1140,18 +1192,19 @@ DOMContext.prototype.draw = function(target)
 
 /**
  * 对指定的显示对象的DOM进行css属性设置或变换。
+ * @param {DisplayObject} target 要进行属性设置或变换的显示对象。
  */
 DOMContext.prototype.transform = function(target)
-{
+{	
 	var image = target.getDrawable(this);
 	//优化：可以对那些添加到DOM后就不再需要变换的显示对象设置transformEnabled=false。
 	if(!target.transformEnabled && target._addedToDOM) return;
-
-	var prefix = Quark.cssPrefix,
-		origin = prefix + "TransformOrigin",
+	
+	var prefix = Quark.cssPrefix, 
+		origin = prefix + "TransformOrigin", 
 		transform = prefix + "Transform",
 		style = image.style;
-
+	
 	if(!style.display || target.propChanged("visible", "alpha"))
 	{
 		style.display = (!target.visible || target.alpha <= 0) ? "none" : "";
@@ -1172,7 +1225,7 @@ DOMContext.prototype.transform = function(target)
 	if(!style[origin] || target.propChanged("regX", "regY"))
 	{
 		style[origin] = target.regX + "px " + target.regY + "px";
-	}
+	}	
 	if(!style[transform] || target.propChanged("x", "y", "regX", "regY", "scaleX", "scaleY", "rotation"))
 	{
 		var css = Quark.supportTransform3D ? getTransformCSS(target, true) : getTransformCSS(target, false);
@@ -1193,6 +1246,9 @@ DOMContext.prototype.transform = function(target)
 
 /**
  * 根据指定对象生成css变换的样式。
+ * @param {DisplayObject} target 显示对象。
+ * @param {Boolean} useTransform3D 是否采用transform—3d变换。在支持transform—3d的浏览器中推荐使用。默认为false。
+ * @return {String} 生成的css样式。
  */
 function getTransformCSS(target, useTransform3D)
 {
@@ -1202,7 +1258,7 @@ function getTransformCSS(target, useTransform3D)
 	{
 		css += "translate3d(" + (target.x-target.regX) + "px, " + (target.y-target.regY) + "px, 0px)"
 			+ "rotate3d(0, 0, 1, " + target.rotation + "deg)"
-			+ "scale3d(" + target.scaleX + ", " + target.scaleY + ", 1)";
+			+ "scale3d(" + target.scaleX + ", " + target.scaleY + ", 1)";			
 	}else
 	{
 		css += "translate(" + (target.x-target.regX) + "px, " + (target.y-target.regY) + "px)"
@@ -1214,6 +1270,7 @@ function getTransformCSS(target, useTransform3D)
 
 /**
  * 隐藏指定对象渲染的dom节点，用于当显示对象visible=0或alpha=0等情况，由显示对象内部方法调用。
+ * @param {DisplayObject} target 要隐藏的显示对象。
  */
 DOMContext.prototype.hide = function(target)
 {
@@ -1222,6 +1279,7 @@ DOMContext.prototype.hide = function(target)
 
 /**
  * 删除指定显示对象渲染的dom节点，由显示对象内部方法调用。
+ * @param {DisplayObject} target 要删除的显示对象。
  */
 DOMContext.prototype.remove = function(target)
 {
@@ -1275,8 +1333,8 @@ UIDUtil.displayObjectToString = function(displayObject)
 (function(){
 
 /**
- * Translates url parameters into a key-value object.
- * 获取并对象化url参数。
+ * 获取URL参数。
+ * @return {Object} 包含URL参数的键值对对象。
  */
 Quark.getUrlParams = function()
 {
@@ -1301,9 +1359,8 @@ var metas = head.getElementsByTagName("meta");
 var metaAfterNode = metas.length > 0 ? metas[metas.length-1].nextSibling : head.childNodes[0];
 
 /**
- * Add a meta tag into the head of the document.
  * 动态添加meta到head中。
- * {Object} props The meta properties to add. e.g. {name:'viewport', content:'width=device-width'}
+ * @param {Object} props 要添加的meta的属性. 格式如：{name:'viewport', content:'width=device-width'}。
  */
 Quark.addMeta = function(props)
 {
@@ -1313,20 +1370,19 @@ Quark.addMeta = function(props)
 };
 
 /**
- * Show or Hide the bounding rects of all display objects on stage. This method is mainly for debugging use.
- * 显示或关闭舞台上所有显示对象的外包围矩形。主要用于调试物体碰撞区域等。
- * @param {Quark.Stage} The stage to be debug.
+ * 显示或关闭舞台上所有显示对象的外包围矩形。此方法主要用于调试物体碰撞区域等。
+ * @param {Stage} stage 要调试的舞台对象。
  */
 Quark.toggleDebugRect = function(stage)
 {
-	stage.debug = !stage.debug;
+	stage.debug = !stage.debug;	
 	if(stage.debug)
 	{
 		stage._render = function(context)
 		{
 			if(context.clear != null) context.clear(0, 0, stage.width, stage.height);
 			Quark.Stage.superClass._render.call(stage, context);
-
+			
 			var ctx = stage.context.context;
 			if(ctx != null)
 			{
@@ -1349,8 +1405,8 @@ Quark.toggleDebugRect = function(stage)
 };
 
 /**
- * Draws the bounding rect of the display object. Internal function.
  * 绘制显示对象的外包围矩形。
+ * @private
  */
 function drawObjectRect(obj, ctx)
 {
@@ -1365,21 +1421,21 @@ function drawObjectRect(obj, ctx)
 			if(ctx != null)
 			{
 				var b = child.getBounds();
-
+								
 				ctx.globalAlpha = 0.2;
 				ctx.beginPath();
 				var p0 = b[0];
-				ctx.moveTo(p0.x-0.5, p0.y-0.5);
+				ctx.moveTo(p0.x-0.5, p0.y-0.5);						
 				for(var j = 1; j < b.length; j++)
 				{
-					var p = b[j];
-					ctx.lineTo(p.x-0.5, p.y-0.5);
+					var p = b[j];					
+					ctx.lineTo(p.x-0.5, p.y-0.5);	
 				}
 				ctx.lineTo(p0.x-0.5, p0.y-0.5);
 				ctx.stroke();
 				ctx.closePath();
 				ctx.globalAlpha = 0.5;
-
+				
 				ctx.beginPath();
 				ctx.rect((b.x>>0)-0.5, (b.y>>0)-0.5, b.width>>0, b.height>>0);
 				ctx.stroke();
@@ -1387,17 +1443,17 @@ function drawObjectRect(obj, ctx)
 			}else
 			{
 				if(child.drawable.domDrawable) child.drawable.domDrawable.style.border = "1px solid #f00";
-			}
+			}	
 		}
 	}
 };
 
 /**
- * Draws the display object into a new canvas for caching use.
  * 把DisplayObject对象绘制到一个新的画布上。可作为缓存使用，也可转换成dataURL格式的位图。
- * @param {Quark.DisplayObject} obj The display object to draw.
- * @param {Boolean} toImage Indicates whether convert to an image in dataURL format.
- * @param {String} type The converting image mime type, 'image/png' is default.
+ * @param {DisplayObject} obj 要缓存的显示对象。
+ * @param {Boolean} toImage 指定是否把缓存转为DataURL格式的。默认为false。
+ * @param {String} type 指定转换为DataURL格式的图片mime类型。默认为"image/png"。
+ * @return {Object} 显示对象的缓存结果。根据参数toImage不同而返回Canvas或Image对象。
  */
 Quark.cacheObject = function(obj, toImage, type)
 {
@@ -1407,7 +1463,7 @@ Quark.cacheObject = function(obj, toImage, type)
 	obj.mask = null;
 	obj.render(context);
 	obj.mask = mask;
-
+	
 	if(toImage)
 	{
 		var img = new Image();
@@ -1421,8 +1477,8 @@ Quark.cacheObject = function(obj, toImage, type)
 
 
 /**
- * A help stage for internal use.
  * 用于Quark内部实现的一个上下文。
+ * @private
  */
 Quark._helpContext = new Quark.CanvasContext({canvas:Quark.createDOM("canvas")});
 
@@ -1433,15 +1489,15 @@ Quark._helpContext = new Quark.CanvasContext({canvas:Quark.createDOM("canvas")})
 (function(){
 
 /**
- * Constructor.
+ * 构造函数.
  * @name Timer
  * @class Timer是一个计时器。它能按指定的时间序列运行代码。
  * @param interval 计时器的时间间隔。以毫秒为单位。
  */
 var Timer = Quark.Timer = function(interval)
-{
+{	
 	this.interval = interval || 50;
-	this.paused = false;
+	this.paused = false;	
 	this.info = {lastTime:0, currentTime:0, deltaTime:0, realDeltaTime:0};
 
 	this._startTime = 0;
@@ -1494,11 +1550,11 @@ Timer.prototype.resume = function()
 Timer.prototype._run = function()
 {
 	if(this.paused) return;
-
+	
 	var info = this.info;
 	var time = info.currentTime = Date.now();
 	info.deltaTime = info.realDeltaTime = time - info.lastTime;
-
+	
 	for(var i = 0, len = this._listeners.length, obj, runTime; i < len; i++)
 	{
 		obj = this._listeners[i];
@@ -1514,7 +1570,7 @@ Timer.prototype._run = function()
 			len--;
 		}
 	}
-
+	
 	info.lastTime = time;
 };
 
@@ -1558,7 +1614,7 @@ Timer.prototype.removeListener = function(obj)
 (function(){
 
 /**
- * Constructor.
+ * 构造函数.
  * @name ImageLoader
  * @augments EventDispatcher
  * @class ImageLoader类是一个图片加载器，用于动态加载图片资源。
@@ -1566,16 +1622,16 @@ Timer.prototype.removeListener = function(obj)
  */
 var ImageLoader = Quark.ImageLoader = function(source)
 {
-	ImageLoader.superClass.constructor.call(this);
-
+	ImageLoader.superClass.constructor.call(this);	
+	
 	this.loading = false; //ready-only
-
+	
 	this._index = -1;
 	this._loaded = 0;
 	this._images = {};
 	this._totalSize = 0;
 	this._loadHandler = Quark.delegate(this._loadHandler, this);
-
+	
 	this._addSource(source);
 };
 Quark.inherit(ImageLoader, Quark.EventDispatcher);
@@ -1592,7 +1648,7 @@ ImageLoader.prototype.load = function(source)
 
 /**
  * 添加图片资源。
- * @private
+ * @private 
  */
 ImageLoader.prototype._addSource = function(source)
 {
@@ -1621,7 +1677,7 @@ ImageLoader.prototype._loadNext = function()
 		this._index = -1;
 		return;
 	}
-
+	
 	var img = new Image();
 	img.onload = this._loadHandler;
 	img.src = this._source[this._index].src;
@@ -1633,13 +1689,13 @@ ImageLoader.prototype._loadNext = function()
  * @private
  */
 ImageLoader.prototype._loadHandler = function(e)
-{
+{	
 	this._loaded++;
 	var image = this._source[this._index];
 	image.image = e.target;
 	var id = image.id || image.src;
 	this._images[id] = image;
-	this.dispatchEvent({type:"loaded", target:this, image:image});
+	this.dispatchEvent({type:"loaded", target:this, image:image});	
 	this._loadNext();
 };
 
@@ -1688,7 +1744,7 @@ ImageLoader.prototype.getTotalSize = function()
 (function(){
 
 /**
- * Constructor.
+ * 构造函数.
  * @name Tween
  * @class Tween类是一个缓动动画类。使用它能实现移动、改变大小、淡入淡出等效果。
  * @param target 实现缓动动画的目标对象。
@@ -1706,11 +1762,11 @@ var Tween = Quark.Tween = function(target, newProps, params)
 	this.interval = 0;
 	this.ease = Easing.Linear.EaseNone;
 	this.next = null;
-
+	
 	this.onStart = null;
 	this.onUpdate = null;
 	this.onComplete = null;
-
+	
 	this._oldProps = {};
 	this._newProps = {};
 	this._deltaProps = {};
@@ -1723,7 +1779,7 @@ var Tween = Quark.Tween = function(target, newProps, params)
 	this._frameCount = 0;
 
 	for(var p in newProps)
-	{
+	{		
 		var oldVal = target[p], newVal = newProps[p];
 		if(oldVal !== undefined)
 		{
@@ -1776,7 +1832,7 @@ Tween.prototype._init = function()
  * 启动缓动动画的播放。
  */
 Tween.prototype.start = function()
-{
+{	
 	this._init();
 	this.paused = false;
 };
@@ -1793,7 +1849,7 @@ Tween.prototype.stop = function()
  * 暂停缓动动画的播放。
  */
 Tween.prototype.pause = function()
-{
+{	
 	this.paused = true;
 	this._pausedStartTime = Date.now();
 };
@@ -1802,7 +1858,7 @@ Tween.prototype.pause = function()
  * 恢复缓动动画的播放。
  */
 Tween.prototype.resume = function()
-{
+{	
 	this.paused = false;
 	this._pausedTime += Date.now() - this._pausedStartTime;
 };
@@ -1817,10 +1873,10 @@ Tween.prototype._update = function()
 	var now = Date.now();
 	var elapsed = now - this._startTime - this._pausedTime;
 	if(elapsed < 0) return;
-
+	
 	if(this._lastTime == 0 && this.onStart != null) this.onStart(this);
 	this._lastTime = now;
-
+	
 	var ratio = this._frameTotal > 0 ? (++this._frameCount / this._frameTotal) : (elapsed / this.time);
 	if(ratio > 1) ratio = 1;
 	var value = this.ease(ratio);
@@ -1829,11 +1885,11 @@ Tween.prototype._update = function()
 	{
 		this.target[p] = this._oldProps[p] + this._deltaProps[p] * this._reverseFlag * value;
 	}
-
+	
 	if(this.onUpdate != null) this.onUpdate(this, value);
 
 	if(ratio >= 1)
-	{
+	{	
 		if(this.reverse)
 		{
 			var tmp = this._oldProps;
@@ -1869,7 +1925,7 @@ Tween.prototype._update = function()
 				}
 			}
 		}
-		if(this.onComplete != null) this.onComplete(this);
+		if(this.onComplete != null) this.onComplete(this);	
 	}
 };
 
@@ -1946,18 +2002,18 @@ Tween.from = function(target, fromProps, params)
 /**
  * 缓动函数集合。
  */
-var Easing = Quark.Easing =
+var Easing = Quark.Easing = 
 {
-	Linear: {},
-	Quadratic: {},
-	Cubic: {},
-	Quartic: {},
-	Quintic: {},
-	Sinusoidal: {},
-	Exponential: {},
-	Circular: {},
-	Elastic: {},
-	Back: {},
+	Linear: {}, 
+	Quadratic: {}, 
+	Cubic: {}, 
+	Quartic: {}, 
+	Quintic: {}, 
+	Sinusoidal: {}, 
+	Exponential: {}, 
+	Circular: {}, 
+	Elastic: {}, 
+	Back: {}, 
 	Bounce: {}
 };
 
@@ -1971,7 +2027,7 @@ Easing.Quadratic.EaseIn = function(k)
 	return k * k;
 };
 
-Easing.Quadratic.EaseOut = function(k)
+Easing.Quadratic.EaseOut = function(k) 
 {
 	return - k * (k - 2);
 };
@@ -1982,7 +2038,7 @@ Easing.Quadratic.EaseInOut = function(k)
 	return -0.5 * (--k * (k - 2) - 1);
 };
 
-Easing.Cubic.EaseIn = function(k)
+Easing.Cubic.EaseIn = function(k) 
 {
 	return k * k * k;
 };
@@ -1992,13 +2048,13 @@ Easing.Cubic.EaseOut = function(k)
 	return --k * k * k + 1;
 };
 
-Easing.Cubic.EaseInOut = function(k)
+Easing.Cubic.EaseInOut = function(k) 
 {
 	if((k *= 2) < 1) return 0.5 * k * k * k;
 	return 0.5 * ((k -= 2) * k * k + 2);
 };
 
-Easing.Quartic.EaseIn = function(k)
+Easing.Quartic.EaseIn = function(k) 
 {
 	return k * k * k * k;
 };
@@ -2019,7 +2075,7 @@ Easing.Quintic.EaseIn = function(k)
 	return k * k * k * k * k;
 };
 
-Easing.Quintic.EaseOut = function(k)
+Easing.Quintic.EaseOut = function(k) 
 {
 	return (k = k - 1) * k * k * k * k + 1;
 };
@@ -2030,7 +2086,7 @@ Easing.Quintic.EaseInOut = function(k)
 	return 0.5 * ((k -= 2) * k * k * k * k + 2);
 };
 
-Easing.Sinusoidal.EaseIn = function(k)
+Easing.Sinusoidal.EaseIn = function(k) 
 {
 	return -Math.cos(k * Math.PI / 2) + 1;
 };
@@ -2045,12 +2101,12 @@ Easing.Sinusoidal.EaseInOut = function(k)
 	return -0.5 * (Math.cos(Math.PI * k) - 1);
 };
 
-Easing.Exponential.EaseIn = function(k)
+Easing.Exponential.EaseIn = function(k) 
 {
 	return k == 0 ? 0 : Math.pow(2, 10 * (k - 1));
 };
 
-Easing.Exponential.EaseOut = function(k)
+Easing.Exponential.EaseOut = function(k) 
 {
 	return k == 1 ? 1 : -Math.pow(2, -10 * k) + 1;
 };
@@ -2063,12 +2119,12 @@ Easing.Exponential.EaseInOut = function(k)
 	return 0.5 * (-Math.pow(2, - 10 * (k - 1)) + 2);
 };
 
-Easing.Circular.EaseIn = function(k)
+Easing.Circular.EaseIn = function(k) 
 {
 	return -(Math.sqrt(1 - k * k) - 1);
 };
 
-Easing.Circular.EaseOut = function(k)
+Easing.Circular.EaseOut = function(k) 
 {
 	return Math.sqrt(1 - --k * k);
 };
@@ -2079,10 +2135,10 @@ Easing.Circular.EaseInOut = function(k)
 	return 0.5 * ( Math.sqrt(1 - (k -= 2) * k) + 1);
 };
 
-Easing.Elastic.EaseIn = function(k)
+Easing.Elastic.EaseIn = function(k) 
 {
 	var s, a = 0.1, p = 0.4;
-	if (k == 0) return 0;
+	if (k == 0) return 0; 
 	else if (k == 1) return 1;
 	else if (!p) p = 0.3;
 	if(!a || a < 1) { a = 1; s = p / 4; }
@@ -2090,22 +2146,22 @@ Easing.Elastic.EaseIn = function(k)
 	return -(a * Math.pow(2, 10 * (k -= 1)) * Math.sin((k - s) * (2 * Math.PI) / p));
 };
 
-Easing.Elastic.EaseOut = function(k)
+Easing.Elastic.EaseOut = function(k) 
 {
 	var s, a = 0.1, p = 0.4;
-	if(k == 0) return 0;
-	else if (k == 1) return 1;
+	if(k == 0) return 0; 
+	else if (k == 1) return 1; 
 	else if (!p) p = 0.3;
 	if(!a || a < 1) { a = 1; s = p / 4; }
 	else s = p / (2 * Math.PI) * Math.asin(1 / a);
 	return (a * Math.pow(2, -10 * k) * Math.sin((k - s) * (2 * Math.PI) / p) + 1);
 };
 
-Easing.Elastic.EaseInOut = function(k)
+Easing.Elastic.EaseInOut = function(k) 
 {
 	var s, a = 0.1, p = 0.4;
-	if (k == 0) return 0;
-	else if (k == 1) return 1;
+	if (k == 0) return 0; 
+	else if (k == 1) return 1; 
 	else if (!p) p = 0.3;
 	if(!a || a < 1) { a = 1; s = p / 4; }
 	else s = p / (2 * Math.PI) * Math.asin(1 / a);
@@ -2114,7 +2170,7 @@ Easing.Elastic.EaseInOut = function(k)
 
 };
 
-Easing.Back.EaseIn = function(k)
+Easing.Back.EaseIn = function(k) 
 {
 	var s = 1.70158;
 	return k * k * ((s + 1) * k - s);
@@ -2126,14 +2182,14 @@ Easing.Back.EaseOut = function(k)
 	return (k = k - 1) * k * (( s + 1) * k + s) + 1;
 };
 
-Easing.Back.EaseInOut = function(k)
+Easing.Back.EaseInOut = function(k) 
 {
 	var s = 1.70158 * 1.525;
 	if ((k *= 2) < 1) return 0.5 * (k * k * ((s + 1) * k - s));
 	return 0.5 * ((k -= 2) * k * ((s + 1) * k + s) + 2);
 };
 
-Easing.Bounce.EaseIn = function(k)
+Easing.Bounce.EaseIn = function(k) 
 {
 	return 1 - Easing.Bounce.EaseOut(1 - k);
 };
@@ -2146,7 +2202,7 @@ Easing.Bounce.EaseOut = function(k)
 	}else if(k < (2 / 2.75))
 	{
 		return 7.5625 * (k -= (1.5 / 2.75)) * k + 0.75;
-	}else if(k < (2.5 / 2.75))
+	}else if(k < (2.5 / 2.75)) 
 	{
 		return 7.5625 * (k -= (2.25 / 2.75)) * k + 0.9375;
 	}else
@@ -2155,7 +2211,7 @@ Easing.Bounce.EaseOut = function(k)
 	}
 };
 
-Easing.Bounce.EaseInOut = function(k)
+Easing.Bounce.EaseInOut = function(k) 
 {
 	if(k < 0.5) return Easing.Bounce.EaseIn(k * 2) * 0.5;
 	return Easing.Bounce.EaseOut(k * 2 - 1) * 0.5 + 0.5;
@@ -2168,7 +2224,7 @@ Easing.Bounce.EaseInOut = function(k)
 (function(){
 
 /**
- * Constructor.
+ * 构造函数.
  * @name Audio
  * @class Audio类是原生Audio的封装。
  * @param src 要加载的声音的地址。
@@ -2177,17 +2233,17 @@ Easing.Bounce.EaseInOut = function(k)
  * @param loop 指示是否循环播放。
  */
 var Audio = Quark.Audio = function(src, preload, autoPlay, loop)
-{
+{	
     Audio.superClass.constructor.call(this);
-
+    
     this.src = src;
 	this.autoPlay = preload && autoPlay;
 	this.loop = loop;
-
+	
 	this._loaded = false;
     this._playing = false;
 	this._evtHandler = Quark.delegate(this._evtHandler, this);
-
+	
 	this._element = document.createElement('audio');
 	this._element.preload = preload;
 	this._element.src = src;
@@ -2199,14 +2255,14 @@ Quark.inherit(Audio, Quark.EventDispatcher);
  * 开始加载声音文件。
  */
 Audio.prototype.load = function()
-{
+{	
 	this._element.addEventListener("progress", this._evtHandler, false);
 	this._element.addEventListener("ended", this._evtHandler, false);
 	this._element.addEventListener("error", this._evtHandler, false);
     try{
         this._element.load();
     }catch(e){trace(e);};
-
+	
 };
 
 /**
@@ -2296,19 +2352,24 @@ Audio.prototype.playing = function()
 (function(){
 
 /**
- * Constructor.
+ * 构造函数.
  * @name Drawable
  * @class Drawable是可绘制图像或DOM的包装。当封装的是HTMLImageElement、HTMLCanvasElement或HTMLVideoElement对象时，可同时支持canvas和dom两种渲染方式，而如果封装的是dom时，则不支持canvas方式。
+ * @param drawable 一个可绘制对象。
+ * @param {Boolean} isDOM 指定参数drawable是否为一个DOM对象。默认为false。
  */
 var Drawable = Quark.Drawable = function(drawable, isDOM)
-{
+{	
 	this.rawDrawable = null;
-	this.domDrawable = null;
+	this.domDrawable = null;	
 	this.set(drawable, isDOM);
 };
 
 /**
  * 根据context上下文获取不同的Drawable包装的对象。
+ * @param {DisplayObject} obj 指定的显示对象。
+ * @param {Context} context 指定的渲染上下文。
+ * @return 返回包装的可绘制对象。
  */
 Drawable.prototype.get = function(obj, context)
 {
@@ -2327,6 +2388,8 @@ Drawable.prototype.get = function(obj, context)
 
 /**
  * 设置Drawable对象。
+ * @param drawable 一个可绘制对象。
+ * @param {Boolean} isDOM 指定参数drawable是否为一个DOM对象。默认为false。
  */
 Drawable.prototype.set = function(drawable, isDOM)
 {
@@ -2343,7 +2406,7 @@ Drawable.prototype.set = function(drawable, isDOM)
 function isDrawable(elem)
 {
 	if(elem == null) return false;
-	return (elem instanceof HTMLImageElement) ||
+	return (elem instanceof HTMLImageElement) || 
 	  	   (elem instanceof HTMLCanvasElement) ||
 	   	   (elem instanceof HTMLVideoElement);
 };
@@ -2355,7 +2418,7 @@ function isDrawable(elem)
 (function(){
 
 /**
- * Constructor.
+ * 构造函数.
  * @name DisplayObject
  * @class DisplayObject类是可放在舞台上的所有显示对象的基类。DisplayObject类定义了若干显示对象的基本属性。渲染一个DisplayObject其实是进行若干变换后再渲染其drawable对象。
  * @augments EventDispatcher
@@ -2378,11 +2441,11 @@ function isDrawable(elem)
  * @property polyArea 指示DisplayObject对象的多边形碰撞区域。默认为null，即使用对象的外包围矩形。
  * @property mask 指示DisplayObject对象的遮罩对象。当上下文为DOMContext时暂时只支持webkit内核浏览器。默认为null。
  * @property parent DisplayObject对象的父容器。只读属性。
- */
+ */	
 var DisplayObject = Quark.DisplayObject = function(props)
 {
 	this.id = Quark.UIDUtil.createUID("DisplayObject");
-
+	
 	this.name = null;
 	this.x = 0;
 	this.y = 0;
@@ -2402,25 +2465,26 @@ var DisplayObject = Quark.DisplayObject = function(props)
 	this.mask = null;
 
 	this.drawable = null;
-	this.parent = null;
+	this.parent = null;	
 	this.context = null;
-
+	
 	this._depth = 0;
 	this._lastState = {};
 	this._stateList = ["x", "y", "regX", "regY", "width", "height", "alpha", "scaleX", "scaleY", "rotation", "visible", "_depth"];
 
 	Quark.merge(this, props, true);
 	if(props.mixin) Quark.merge(this, props.mixin, false);
-	if(this.align) this.setAlign(this.align);
+
 	DisplayObject.superClass.constructor.call(this, props);
 };
 Quark.inherit(DisplayObject, Quark.EventDispatcher);
 
 /**
  * 设置可绘制对象，默认是一个Image对象，可通过覆盖此方法进行DOM绘制。
+ * @param {Object} drawable 要设置的可绘制对象。一般是一个Image对象。
  */
 DisplayObject.prototype.setDrawable = function(drawable)
-{
+{ 
 	if(this.drawable == null)
 	{
 		this.drawable = new Quark.Drawable(drawable);
@@ -2432,6 +2496,7 @@ DisplayObject.prototype.setDrawable = function(drawable)
 
 /**
  * 获得可绘制对象实体，如Image或Canvas等其他DOM对象。
+ * @param {Context} context 渲染上下文。
  */
 DisplayObject.prototype.getDrawable = function(context)
 {
@@ -2441,30 +2506,34 @@ DisplayObject.prototype.getDrawable = function(context)
 
 /**
  * 对象数据更新接口，仅供框架内部或组件开发者使用。用户通常应该重写update方法。
+ * @protected
  */
 DisplayObject.prototype._update = function(timeInfo)
-{
+{ 
 	this.update(timeInfo);
 };
 
 /**
  * 对象数据更新接口，可通过覆盖此方法实现对象的数据更新。
+ * @param {Object} timeInfo 对象更新所需的时间信息。
+ * @return {Boolean} 更新成功返回true，否则为false。
  */
 DisplayObject.prototype.update = function(timeInfo){ return true; };
 
 /**
  * 对象渲染接口，仅供框架内部或组件开发者使用。用户通常应该重写render方法。
+ * @protected
  */
 DisplayObject.prototype._render = function(context)
 {
 	var ctx = this.context || context;
-	if(!this.visible || this.alpha <= 0)
+	if(!this.visible || this.alpha <= 0) 
 	{
 		if(ctx.hide != null) ctx.hide(this);
 		this.saveState(["visible", "alpha"]);
 		return;
 	}
-
+	
 	ctx.startDraw();
 	ctx.transform(this);
 	this.render(ctx);
@@ -2474,6 +2543,7 @@ DisplayObject.prototype._render = function(context)
 
 /**
  * DisplayObject对象渲染接口，可通过覆盖此方法实现对象的渲染。
+ * @param {Context} context 渲染上下文。
  */
 DisplayObject.prototype.render = function(context)
 {
@@ -2482,6 +2552,7 @@ DisplayObject.prototype.render = function(context)
 
 /**
  * 保存DisplayObject对象的状态列表中的各种属性状态。
+ * @param {Array} list 要保存的属性名称列表。默认为null。
  */
 DisplayObject.prototype.saveState = function(list)
 {
@@ -2496,16 +2567,20 @@ DisplayObject.prototype.saveState = function(list)
 
 /**
  * 获得DisplayObject对象保存的状态列表中的指定的属性状态。
+ * @param {String} propName 要获取的属性状态名称。
+ * @return 返回指定属性的最后一次保存状态值。
  */
-DisplayObject.prototype.getState = function(p)
+DisplayObject.prototype.getState = function(propName)
 {
-	return this._lastState["last" + p];
+	return this._lastState["last" + propName];
 };
 
 /**
  * 比较DisplayObject对象的当前状态和最近一次保存的状态，返回指定属性中是否发生改变。
+ * @param prop 可以是单个或多个属性参数。
+ * @return 属性改变返回true，否则返回false。
  */
-DisplayObject.prototype.propChanged = function()
+DisplayObject.prototype.propChanged = function(prop)
 {
 	var list = arguments.length > 0 ? arguments : this._stateList;
 	for(var i = 0, len = list.length; i < len; i++)
@@ -2518,7 +2593,10 @@ DisplayObject.prototype.propChanged = function()
 
 /**
  * 计算DisplayObject对象的包围矩形，以确定由x和y参数指定的点是否在其包围矩形之内。
- * @return 在包围矩形之内返回1，在边界上返回0，否则返回-1。
+ * @param {Number} x 指定碰撞点的x坐标。
+ * @param {Number} y 指定碰撞点的y坐标。
+ * @param {Boolean} usePolyCollision 指定是否采用多边形碰撞。默认为false。
+ * @return {Number} 在包围矩形之内返回1，在边界上返回0，否则返回-1。
  */
 DisplayObject.prototype.hitTestPoint = function(x, y, usePolyCollision)
 {
@@ -2527,7 +2605,9 @@ DisplayObject.prototype.hitTestPoint = function(x, y, usePolyCollision)
 
 /**
  * 计算DisplayObject对象的包围矩形，以确定由object参数指定的显示对象是否与其相交。
- * @return 相交返回true，否则返回false。
+ * @param {DisplayObject} object 指定检测碰撞的显示对象。
+ * @param {Boolean} usePolyCollision 指定是否采用多边形碰撞。默认为false。
+ * @return {Boolean} 相交返回true，否则返回false。
  */
 DisplayObject.prototype.hitTestObject = function(object, usePolyCollision)
 {
@@ -2536,6 +2616,9 @@ DisplayObject.prototype.hitTestObject = function(object, usePolyCollision)
 
 /**
  * 将x和y指定的点从显示对象的（本地）坐标转换为舞台（全局）坐标。
+ * @param {Number} x 显示对象的本地x轴坐标。
+ * @param {Number} y 显示对象的本地y轴坐标。
+ * @return {Object} 返回转换后的全局坐标对象。格式如：{x:10, y:10}。
  */
 DisplayObject.prototype.localToGlobal = function(x, y)
 {
@@ -2545,8 +2628,11 @@ DisplayObject.prototype.localToGlobal = function(x, y)
 
 /**
  * 将x和y指定的点从舞台（全局）坐标转换为显示对象的（本地）坐标。
+ * @param {Number} x 显示对象的全局x轴坐标。
+ * @param {Number} y 显示对象的全局y轴坐标。
+ * @return {Object} 返回转换后的本地坐标对象。格式如：{x:10, y:10}。
  */
-DisplayObject.prototype.globalToLocal = function(x, y)
+DisplayObject.prototype.globalToLocal = function(x, y) 
 {
 	var cm = this.getConcatenatedMatrix().invert();
 	return {x:cm.tx+x, y:cm.ty+y};
@@ -2554,8 +2640,11 @@ DisplayObject.prototype.globalToLocal = function(x, y)
 
 /**
  * 将x和y指定的点从显示对象的（本地）坐标转换为指定对象的坐标系里坐标。
+ * @param {Number} x 显示对象的本地x轴坐标。
+ * @param {Number} y 显示对象的本地y轴坐标。
+ * @return {Object} 返回转换后指定对象的本地坐标对象。格式如：{x:10, y:10}。
  */
-DisplayObject.prototype.localToTarget = function(x, y, target)
+DisplayObject.prototype.localToTarget = function(x, y, target) 
 {
 	var p = this.localToGlobal(x, y);
 	return target.globalToLocal(p.x, p.y);
@@ -2563,13 +2652,14 @@ DisplayObject.prototype.localToTarget = function(x, y, target)
 
 /**
  * 获得一个对象相对于其某个祖先（默认即舞台）的连接矩阵。
+ * @private
  */
-DisplayObject.prototype.getConcatenatedMatrix = function(ancestor)
-{
+DisplayObject.prototype.getConcatenatedMatrix = function(ancestor) 
+{	
 	var mtx = new Quark.Matrix(1, 0, 0, 1, 0, 0);
 	if(ancestor == this) return mtx;
 	for(var o = this; o.parent != null && o.parent != ancestor; o = o.parent)
-	{
+	{		
 		var cos = 1, sin = 0;
 		if(o.rotation%360 != 0)
 		{
@@ -2577,10 +2667,10 @@ DisplayObject.prototype.getConcatenatedMatrix = function(ancestor)
 			cos = Math.cos(r);
 			sin = Math.sin(r);
 		}
-
+		
 		if(o.regX != 0) mtx.tx -= o.regX;
 		if(o.regY != 0) mtx.ty -= o.regY;
-
+		
 		mtx.concat(new Quark.Matrix(cos*o.scaleX, sin*o.scaleX, -sin*o.scaleY, cos*o.scaleY, o.x, o.y));
 	}
 	return mtx;
@@ -2588,20 +2678,21 @@ DisplayObject.prototype.getConcatenatedMatrix = function(ancestor)
 
 /**
  * 返回DisplayObject对象在舞台全局坐标系内的矩形区域以及所有顶点。
+ * @return {Object} 返回显示对象的矩形区域。
  */
 DisplayObject.prototype.getBounds = function()
-{
+{	
 	var w = this.width, h = this.height;
 	var mtx = this.getConcatenatedMatrix();
-
+	
 	var poly = this.polyArea || [{x:0, y:0}, {x:w, y:0}, {x:w, y:h}, {x:0, y:h}];
-
-	var vertexs = [], len = poly.length, v, minX, maxX, minY, maxY;
+	
+	var vertexs = [], len = poly.length, v, minX, maxX, minY, maxY;	
 	v = mtx.transformPoint(poly[0], true, true);
 	minX = maxX = v.x;
 	minY = maxY = v.y;
 	vertexs[0] = v;
-
+	
 	for(var i = 1; i < len; i++)
 	{
 		var v = mtx.transformPoint(poly[i], true, true);
@@ -2611,7 +2702,7 @@ DisplayObject.prototype.getBounds = function()
 		else if(maxY < v.y) maxY = v.y;
 		vertexs[i] = v;
 	}
-
+	
 	vertexs.x = minX;
 	vertexs.y = minY;
 	vertexs.width = maxX - minX;
@@ -2621,6 +2712,7 @@ DisplayObject.prototype.getBounds = function()
 
 /**
  * 获得DisplayObject对象变形后的宽度。
+ * @return {Number} 返回对象变形后的宽度。
  */
 DisplayObject.prototype.getCurrentWidth = function()
 {
@@ -2629,6 +2721,7 @@ DisplayObject.prototype.getCurrentWidth = function()
 
 /**
  * 获得DisplayObject对象变形后的高度。
+ * @return {Number} 返回对象变形后的高度。
  */
 DisplayObject.prototype.getCurrentHeight = function()
 {
@@ -2637,6 +2730,7 @@ DisplayObject.prototype.getCurrentHeight = function()
 
 /**
  * 获得DisplayObject对象的舞台引用。如未被添加到舞台，则返回null。
+ * @return {Stage} 返回对象的舞台。
  */
 DisplayObject.prototype.getStage = function()
 {
@@ -2647,10 +2741,10 @@ DisplayObject.prototype.getStage = function()
 };
 
 /**
- * Draws the display object into a new canvas for caching use. This can provide faster rendering for complex object that doesn't change frequently.
  * 把DisplayObject对象缓存到一个新的canvas，对于包含复杂内容且不经常改变的对象使用缓存，可以提高渲染速度。
- * @param {Boolean} toImage Indicates whether convert to an image in dataURL format.
- * @param {String} type The converting image mime type when 'toImage' sets to true, 'image/png' is default.
+ * @param {Boolean} toImage 指定是否把缓存转为DataURL格式的。默认为false。
+ * @param {String} type 指定转换为DataURL格式的图片mime类型。默认为"image/png"。
+ * @return {Object} 显示对象的缓存结果。根据参数toImage不同而返回Canvas或Image对象。
  */
 Quark.DisplayObject.prototype.cache  = function(toImage, type)
 {
@@ -2658,7 +2752,6 @@ Quark.DisplayObject.prototype.cache  = function(toImage, type)
 };
 
 /**
- * Clears the cache.
  * 清除缓存。
  */
 Quark.DisplayObject.prototype.uncache = function()
@@ -2668,56 +2761,22 @@ Quark.DisplayObject.prototype.uncache = function()
 
 /**
  * 把DisplayObject对象转换成dataURL格式的位图。
+ * @param {String} type 指定转换为DataURL格式的图片mime类型。默认为"image/png"。
  */
 Quark.DisplayObject.prototype.toImage = function(type)
-{
+{	
 	return Quark.cacheObject(this, true, type);
 };
 
 /**
  * 返回DisplayObject对象的全路径的字符串表示形式，方便debug。如Stage1.Container2.Bitmap3。
+ * @return {String} 返回对象的全路径的字符串表示形式。如Stage1.Container2.Bitmap3。
  */
 DisplayObject.prototype.toString = function()
 {
 	return Quark.UIDUtil.displayObjectToString(this);
 };
 
-/**
-* 设置对齐的方式,动态计算regX,regY
-* @params atype
-*/
-DisplayObject.prototype.setAlign = function(align_type){
-	var reg = [this.regX,this.regY];
-	var _able = ['tl','tr','ct','bl','br',"tc","bc","lc","rc"];
-	if(!~_able.indexOf(align_type)) return;
-	switch(align_type){
-		case "tl":
-			reg = [0,0];
-			break;
-		case "tr" :
-			reg = [this.width,0];
-			break;
-		case "ct" :
-			reg = [this.width/2,this.height/2];
-			break;
-		case "bl" :
-			reg = [0,this.height];
-		case "br" :
-			reg = [this.width,this.height];
-			break;
-		case "tc" :
-			reg = [this.width/2,0];
-			break;
-		case "bc" :
-			reg = [this.width/2,this.height];
-			break;
-		default:
-			break;
-	}
-	this.regX = reg[0];
-	this.regY = reg[1];
-	return this;
-};
 })();
 
 
@@ -2725,7 +2784,7 @@ DisplayObject.prototype.setAlign = function(align_type){
 (function(){
 
 /**
- * Constructor.
+ * 构造函数.
  * @name DisplayObjectContainer
  * @augments DisplayObject
  * @class DisplayObjectContainer类继承自DisplayObject，是显示列表中显示对象容器的基类。每个DisplayObjectContainer对象都有自己的子级列表children，用于组织对象的Z轴顺序。注意：DisplayObjectContainer对象的宽高默认为0，在autoSize=false的情况下，需要手动设置宽高。
@@ -2739,11 +2798,11 @@ var DisplayObjectContainer = Quark.DisplayObjectContainer = function(props)
 	this.children = [];
 
 	props = props || {};
-	DisplayObjectContainer.superClass.constructor.call(this, props);
+	DisplayObjectContainer.superClass.constructor.call(this, props);		
 	this.id = props.id || Quark.UIDUtil.createUID("DisplayObjectContainer");
 
 	this.setDrawable(props.drawable || props.image || null);
-
+	
 	if(props.children)
 	{
 		for(var i = 0; i < props.children.length; i++)
@@ -2756,12 +2815,15 @@ Quark.inherit(DisplayObjectContainer, Quark.DisplayObject);
 
 /**
  * 将一个DisplayObject子实例添加到该DisplayObjectContainer实例的子级列表中的指定位置。
+ * @param {DisplayObject} child 要添加的显示对象。
+ * @param {Integer} index 指定显示对象要被添加到的索引位置。
+ * @return {DisplayObjectContainer} 返回显示容器本身。
  */
 DisplayObjectContainer.prototype.addChildAt = function(child, index)
 {
 	if(index < 0) index = 0;
 	else if(index > this.children.length) index = this.children.length;
-
+	
 	var childIndex = this.getChildIndex(child);
 	if(childIndex != -1)
 	{
@@ -2774,24 +2836,26 @@ DisplayObjectContainer.prototype.addChildAt = function(child, index)
 
 	this.children.splice(index, 0, child);
 	child.parent = this;
-
+	
 	if(this.autoSize)
-	{
+	{		
 		var rect = new Quark.Rectangle(0, 0, this.rectWidth || this.width, this.rectHeight || this.height);
 		var childRect = new Quark.Rectangle(child.x, child.y, child.rectWidth || child.width, child.rectHeight || child.height);
 		rect.union(childRect);
 		this.width = rect.width;
 		this.height = rect.height;
 	}
-
+	
 	return this;
 };
 
 /**
  * 将一个DisplayObject子实例添加到该DisplayObjectContainer实例的子级列表中。
+ * @param {DisplayObject} child 要添加的显示对象。
+ * @return {DisplayObjectContainer} 返回显示容器本身。
  */
 DisplayObjectContainer.prototype.addChild = function(child)
-{
+{	
 	var start = this.children.length;
 	for(var i = 0; i < arguments.length; i++)
 	{
@@ -2803,12 +2867,14 @@ DisplayObjectContainer.prototype.addChild = function(child)
 
 /**
  * 从DisplayObjectContainer的子级列表中指定索引处删除子对象。
+ * @param {Integer} index 指定要删除的显示对象的索引位置。
+ * @return {Boolean} 删除成功返回true，否则返回false。
  */
 DisplayObjectContainer.prototype.removeChildAt = function(index)
 {
 	if (index < 0 || index >= this.children.length) return false;
 	var child = this.children[index];
-	if (child != null)
+	if (child != null) 
 	{
 		var stage = this.getStage();
 		if(stage != null) stage.context.remove(child);
@@ -2820,6 +2886,8 @@ DisplayObjectContainer.prototype.removeChildAt = function(index)
 
 /**
  * 从DisplayObjectContainer的子级列表中删除指定子对象。
+ * @param {DisplayObject} child 指定要删除的显示对象。
+ * @return {Boolean} 删除成功返回true，否则返回false。
  */
 DisplayObjectContainer.prototype.removeChild = function(child)
 {
@@ -2836,6 +2904,8 @@ DisplayObjectContainer.prototype.removeAllChildren = function()
 
 /**
  * 返回DisplayObjectContainer的位于指定索引处的子显示对象。
+ * @param {Integer} index 指定子显示对象的索引位置。
+ * @return {DisplayObject} 返回指定的子显示对象。
  */
 DisplayObjectContainer.prototype.getChildAt = function(index)
 {
@@ -2845,6 +2915,8 @@ DisplayObjectContainer.prototype.getChildAt = function(index)
 
 /**
  * 返回指定对象在DisplayObjectContainer的子级列表中的索引位置。
+ * @param {Integer} child 指定子显示对象。
+ * @return {Integer} 返回指定子显示对象的索引位置。
  */
 DisplayObjectContainer.prototype.getChildIndex = function(child)
 {
@@ -2853,6 +2925,8 @@ DisplayObjectContainer.prototype.getChildIndex = function(child)
 
 /**
  * 设置指定对象在DisplayObjectContainer的子级列表中的索引位置。
+ * @param {DisplayObject} child 指定子显示对象。
+ * @param {Integer} index 指定子显示对象新的索引位置。
  */
 DisplayObjectContainer.prototype.setChildIndex = function(child, index)
 {
@@ -2865,6 +2939,8 @@ DisplayObjectContainer.prototype.setChildIndex = function(child, index)
 
 /**
  * 交换在DisplayObjectContainer的子级列表中的两个子对象的索引位置。
+ * @param {DisplayObject} child1 指定交换索引位置的子显示对象1。
+ * @param {DisplayObject} child2 指定交换索引位置的子显示对象2。
  */
 DisplayObjectContainer.prototype.swapChildren = function(child1, child2)
 {
@@ -2875,6 +2951,8 @@ DisplayObjectContainer.prototype.swapChildren = function(child1, child2)
 
 /**
  * 交换在DisplayObjectContainer的子级列表中的指定索引位置的两个子对象。
+ * @param {Integer} index1 指定交换索引位置1。
+ * @param {Integer} index2 指定交换索引位置2。
  */
 DisplayObjectContainer.prototype.swapChildrenAt = function(index1, index2)
 {
@@ -2885,6 +2963,8 @@ DisplayObjectContainer.prototype.swapChildrenAt = function(index1, index2)
 
 /**
  * 返回DisplayObjectContainer中指定id的子显示对象。
+ * @param {String} 指定子显示对象的id。
+ * @return {DisplayObject} 返回指定id的子显示对象。
  */
 DisplayObjectContainer.prototype.getChildById = function(id)
 {
@@ -2898,12 +2978,14 @@ DisplayObjectContainer.prototype.getChildById = function(id)
 
 /**
  * 删除并返回DisplayObjectContainer中指定id的子显示对象。
+ * @param {String} 指定子显示对象的id。
+ * @return {DisplayObject} 返回删除的指定id的子显示对象。
  */
 DisplayObjectContainer.prototype.removeChildById = function(id)
-{
+{	
 	for(var i = 0, len = this.children.length; i < len; i++)
 	{
-		if(this.children[i].id == id)
+		if(this.children[i].id == id) 
 		{
 			return this.removeChildAt(i);
 		}
@@ -2913,6 +2995,7 @@ DisplayObjectContainer.prototype.removeChildById = function(id)
 
 /**
  * 根据参数keyOrFunction指定的子元素键值或自定义函数对DisplayObjectContainer的子元素进行排序。
+ * @param keyOrFunction 指定排序的子元素的键值或自定义函数。
  */
 DisplayObjectContainer.prototype.sortChildren = function(keyOrFunction)
 {
@@ -2930,6 +3013,8 @@ DisplayObjectContainer.prototype.sortChildren = function(keyOrFunction)
 
 /**
  * 确定指定对象是否为DisplayObjectContainer的子显示对象。
+ * @param {DisplayObject} child 指定的显示对象。
+ * @return {Boolean} 指定对象为DisplayObjectContainer的子显示对象返回true，否则返回false。
  */
 DisplayObjectContainer.prototype.contains = function(child)
 {
@@ -2937,7 +3022,8 @@ DisplayObjectContainer.prototype.contains = function(child)
 };
 
 /**
- * 返回DisplayObjectContainer的子显示对象数目。
+ * 返回DisplayObjectContainer的子显示对象的数量。
+ * @return {Integer} 返回子显示对象的数量。
  */
 DisplayObjectContainer.prototype.getNumChildren = function()
 {
@@ -2946,6 +3032,7 @@ DisplayObjectContainer.prototype.getNumChildren = function()
 
 /**
  * 覆盖父类DisplayObject的_update方法，更新所有子显示对象的深度。
+ * @protected
  */
 DisplayObjectContainer.prototype._update = function(timeInfo)
 {
@@ -2953,7 +3040,7 @@ DisplayObjectContainer.prototype._update = function(timeInfo)
 	var result = true;
 	if(this.update != null) result = this.update(timeInfo);
 	if(result === false) return;
-
+	
 	var copy = this.children.slice(0);
 	for(var i = 0, len = copy.length; i < len; i++)
 	{
@@ -2965,11 +3052,12 @@ DisplayObjectContainer.prototype._update = function(timeInfo)
 
 /**
  * 渲染DisplayObjectContainer本身及其所有子显示对象。
+ * @param {Context} 渲染上下文。
  */
 DisplayObjectContainer.prototype.render = function(context)
 {
 	DisplayObjectContainer.superClass.render.call(this, context);
-
+	
 	for(var i = 0, len = this.children.length; i < len; i++)
 	{
 		var child = this.children[i];
@@ -2979,18 +3067,23 @@ DisplayObjectContainer.prototype.render = function(context)
 
 /**
  * 返回x和y指定点下的DisplayObjectContainer的子项（或孙子项，依此类推）的数组集合。默认只返回最先加入的子显示对象。
+ * @param {Number} x 指定点的x轴坐标。
+ * @param {Number} y 指定点的y轴坐标。
+ * @param {Boolean} usePolyCollision 指定是否采用多边形碰撞检测。默认为false。
+ * @param {Boolean} returnAll 指定是否返回指定点下的所有显示对象。默认为false。
+ * @return 返回指定点下的显示对象集合，当然returnAll为false时只返回最先加入的子显示对象。
  */
 DisplayObjectContainer.prototype.getObjectUnderPoint = function(x, y, usePolyCollision, returnAll)
 {
 	if(returnAll) var result = [];
-
+	
 	for(var i = this.children.length - 1; i >= 0; i--)
 	{
 		var child = this.children[i];
 		if(child == null || (!child.eventEnabled && child.children == undefined) || !child.visible || child.alpha <= 0) continue;
-
+		
 		if(child.children != undefined && child.eventChildren && child.getNumChildren() > 0)
-		{
+		{			
 			var obj = child.getObjectUnderPoint(x, y, usePolyCollision, returnAll);
 			if(obj)
 			{
@@ -3003,7 +3096,7 @@ DisplayObjectContainer.prototype.getObjectUnderPoint = function(x, y, usePolyCol
 			}
 		}else
 		{
-			if(child.hitTestPoint(x, y, usePolyCollision) >= 0)
+			if(child.hitTestPoint(x, y, usePolyCollision) >= 0) 
 			{
 				if(returnAll) result.push(child);
 				else return child;
@@ -3013,7 +3106,7 @@ DisplayObjectContainer.prototype.getObjectUnderPoint = function(x, y, usePolyCol
 	if(returnAll) return result;
 	return null;
 };
-
+	
 })();
 
 
@@ -3021,7 +3114,7 @@ DisplayObjectContainer.prototype.getObjectUnderPoint = function(x, y, usePolyCol
 (function(){
 
 /**
- * Constructor.
+ * 构造函数.
  * @name Stage
  * @augments DisplayObjectContainer
  * @class 舞台是显示对象的根，所有显示对象都会被添加到舞台上，必须传入一个context使得舞台能被渲染。舞台是一种特殊显示对象容器，可以容纳子显示对象。
@@ -3035,14 +3128,14 @@ var Stage = Quark.Stage = function(props)
 	this.stageX = 0;
 	this.stageY = 0;
 	this.paused = false;
-
+	  
 	this._eventTarget = null;
-
+	
 	props = props || {};
 	Stage.superClass.constructor.call(this, props);
 	this.id = props.id || Quark.UIDUtil.createUID("Stage");
 	if(this.context == null) throw "Quark.Stage Error: context is required.";
-
+	
 	this.updatePosition();
 };
 Quark.inherit(Stage, Quark.DisplayObjectContainer);
@@ -3061,7 +3154,7 @@ Stage.prototype.step = function(timeInfo)
  * 更新舞台Stage上所有显示对象的数据。
  */
 Stage.prototype._update = function(timeInfo)
-{
+{	
 	//Stage作为根容器，先更新所有子对象，再调用update方法。
 	var copy = this.children.slice(0);
 	for(var i = 0, len = copy.length; i < len; i++)
@@ -3088,16 +3181,16 @@ Stage.prototype._render = function(context)
  * 舞台Stage默认的事件处理器。
  */
 Stage.prototype.dispatchEvent = function(e)
-{
+{	
 	var x = e.pageX || e.clientX, y = e.pageY || e.clientY;
 	x = (x - this.stageX) / this.scaleX;
 	y = (y - this.stageY) / this.scaleY;
 	var obj = this.getObjectUnderPoint(x, y, true), target = this._eventTarget;
-
+	
 	e.eventX = x;
 	e.eventY = y;
-
-	var leave = e.type == "mouseout" && !this.context.canvas.contains(e.relatedTarget);
+	
+	var leave = e.type == "mouseout" && !this.context.canvas.contains(e.relatedTarget);	
 	if(target != null && (target != obj || leave))
 	{
 		e.lastEventTarget = target;
@@ -3106,21 +3199,21 @@ Stage.prototype.dispatchEvent = function(e)
 		if(outEvent) target.dispatchEvent({type:outEvent});
 		this._eventTarget = null;
 	}
-
+	
 	//派发事件到目标对象
 	if(obj!= null && obj.eventEnabled && e.type != "mouseout")
 	{
 		e.eventTarget = target = this._eventTarget = obj;
 		obj.dispatchEvent(e);
 	}
-
+	
 	//设置光标状态
 	if(!Quark.supportTouch)
 	{
 		var cursor = (target && target.useHandCursor && target.eventEnabled) ? "pointer" : "";
 		this.context.canvas.style.cursor = cursor;
 	}
-
+	
 	if(leave || e.type != "mouseout") Stage.superClass.dispatchEvent.call(this, e);
 };
 
@@ -3141,25 +3234,27 @@ Stage.prototype.updatePosition = function()
 (function(){
 
 /**
- * Constructor.
+ * 构造函数.
  * @name Bitmap
  * @augments DisplayObject
  * @class Bitmap位图类，表示位图图像的显示对象，简单说它就是Image对象的某个区域的抽象表示。
- * @argument props 参数JSON格式为：{image:imgElem, rect:[0,0,100,100]} 其中image是Image对象，rect指定Image区域。
+ * @argument {Object} props 一个对象，包含以下属性：
+ * <p>image - Image对象。</p>
+ * <p>rect - Image对象的矩形区域。格式为：[0,0,100,100]</p>
  */
 var Bitmap = Quark.Bitmap = function(props)
-{
+{	
 	this.image = null;
 	this.rectX = 0; //ready-only
 	this.rectY = 0; //ready-only
 	this.rectWidth = 0; //ready-only
 	this.rectHeight = 0; //ready-only
-
+	
 	props = props || {};
 	Bitmap.superClass.constructor.call(this, props);
 	this.id = props.id || Quark.UIDUtil.createUID("Bitmap");
-
-	this.setRect(props.rect || [0, 0, this.image.width, this.image.height]);
+	
+	this.setRect(props.rect || [0, 0, this.image.width, this.image.height]);	
 	this.setDrawable(this.image);
 	this._stateList.push("rectX", "rectY", "rectWidth", "rectHeight");
 };
@@ -3167,19 +3262,19 @@ Quark.inherit(Bitmap, Quark.DisplayObject);
 
 /**
  * 设置Bitmap对象的image的显示区域。
+ * @param {Array} rect 要设置的显示区域数组。格式为：[rectX, rectY, rectWidth, rectHeight]。
  */
 Bitmap.prototype.setRect = function(rect)
 {
 	this.rectX = rect[0];
 	this.rectY = rect[1];
-	this.rectWidth  = rect[2];
-	this.rectHeight  = rect[3];
-	this.width = this.width || rect[2];
-	this.height = this.height || rect[3];
+	this.rectWidth = this.width = rect[2];
+	this.rectHeight = this.height = rect[3];
 };
 
 /**
  * 覆盖父类的渲染方法。渲染image指定的显示区域。
+ * @param {Context} context 渲染上下文。
  */
 Bitmap.prototype.render = function(context)
 {
@@ -3193,23 +3288,23 @@ Bitmap.prototype.render = function(context)
 (function(){
 
 /**
- * Constructor.
+ * 构造函数.
  * @name MovieClip
  * @augments Bitmap
  * @class MovieClip影片剪辑类，表示一组动画片段。MovieClip是由Image对象的若干矩形区域组成的集合序列，并按照一定规则顺序播放。帧frame的定义格式为：{rect:*required*, label:"", interval:0, stop:0, jump:-1}。
  */
 var MovieClip = Quark.MovieClip = function(props)
-{
-	this.interval = 0;
+{	
+	this.interval = 0;	
 	this.paused = false;
 	this.useFrames = false;
 	this.currentFrame = 0; //read-only
-
+	
 	this._frames = [];
-	this._frameLabels = {};
+	this._frameLabels = {};	
 	this._frameDisObj = null;
 	this._displayedCount = 0;
-
+	
 	props = props || {};
 	MovieClip.superClass.constructor.call(this, props);
 	this.id = props.id || Quark.UIDUtil.createUID("MovieClip");
@@ -3241,7 +3336,7 @@ MovieClip.prototype.setFrame = function(frame, index)
 {
 	if(index == undefined || index > this._frames.length) index = this._frames.length;
 	else if(index < 0) index = 0;
-
+	
 	this._frames[index] = frame;
 	if(frame.label) this._frameLabels[frame.label] = frame;
 	if(frame.interval == undefined) frame.interval = this.interval;
@@ -3277,7 +3372,7 @@ MovieClip.prototype.stop = function()
  * 跳转到指定位置或标签的帧，并停止播放动画序列。
  */
 MovieClip.prototype.gotoAndStop = function(indexOrLabel)
-{
+{	
 	this.currentFrame = this.getFrameIndex(indexOrLabel);
 	this.paused = true;
 };
@@ -3297,7 +3392,7 @@ MovieClip.prototype.gotoAndPlay = function(indexOrLabel)
 MovieClip.prototype.getFrameIndex = function(indexOrLabel)
 {
 	if(typeof(indexOrLabel) == "number") return indexOrLabel;
-	var frame = this._frameLabels[indexOrLabel], frames = this._frames;
+	var frame = this._frameLabels[indexOrLabel], frames = this._frames;	
 	for(var i = 0; i < frames.length; i++)
 	{
 		if(frame == frames[i]) return i;
@@ -3309,23 +3404,23 @@ MovieClip.prototype.getFrameIndex = function(indexOrLabel)
  * 播放动画序列的下一帧。
  */
 MovieClip.prototype.nextFrame = function(displayedDelta)
-{
+{	
 	var frame = this._frames[this.currentFrame];
-
+	
 	if(frame.interval > 0)
 	{
 		var count = this._displayedCount + displayedDelta;
 		this._displayedCount = frame.interval > count ? count : 0;
 	}
-
-	if(frame.jump >= 0 || typeof(frame.jump) == "string")
+	
+	if(frame.jump >= 0 || typeof(frame.jump) == "string") 
 	{
 		if(this._displayedCount == 0 || !frame.interval)
 		{
 			return this.currentFrame = this.getFrameIndex(frame.jump);
 		}
 	}
-
+	
 	if(frame.interval > 0 && this._displayedCount > 0) return this.currentFrame;
 	else if(this.currentFrame >= this._frames.length - 1) return this.currentFrame = 0;
 	else return ++this.currentFrame;
@@ -3350,13 +3445,14 @@ MovieClip.prototype._update = function(timeInfo)
 		this.stop();
 		return;
 	}
-	if(!this.paused)
+	
+	if(!this.paused) 
 	{
 		var delta = this.useFrames ? 1 : timeInfo && timeInfo.deltaTime;
 		this.nextFrame(delta);
+		this.setRect(this._frames[this.currentFrame].rect);
 	}
-	this.setRect(frame.rect);
-
+	
 	MovieClip.superClass._update.call(this, timeInfo);
 };
 
@@ -3376,17 +3472,22 @@ MovieClip.prototype.render = function(context)
 (function(){
 
 /**
- * Constructor.
+ * 构造函数.
  * @name Button
  * @augments DisplayObjectContainer
  * @class Button类继承自DisplayObjectContainer，是Quark中的简单按钮实现。
- * @argument props 参数JSON格式为：{image:imgElem, up:[0,0,50,50], over:[50,0,50,50], down:[100,0,50,50], disabled:[150,0,50,50]}。
+ * @argument {Object} props 一个对象，包含以下属性：
+ * <p>image - Image对象。</p>
+ * <p>up - 按钮弹起状态下的显示帧数组对象。如：[0,0,50,50]。
+ * <p>over - 按钮经过状态下的显示帧数组对象。如：[50,0,50,50]。
+ * <p>down - 按钮按下状态下的显示帧数组对象。如：[100,0,50,50]。
+ * <p>disabled - 按钮不可用状态下的显示帧数组对象。如：[150,0,50,50]。
  */
 var Button = Quark.Button = function(props)
 {
 	this.state = Button.UP;
 	this.enabled = true;
-
+    
 	props = props || {};
 	Button.superClass.constructor.call(this, props);
 	this.id = props.id || Quark.UIDUtil.createUID("Button");
@@ -3405,24 +3506,26 @@ var Button = Quark.Button = function(props)
 Quark.inherit(Button, Quark.DisplayObjectContainer);
 
 /**
- * 按钮的弹起状态。常数。
+ * 按钮的弹起状态。常量值。
  */
 Button.UP = "up";
 /**
- * 按钮的经过状态。常数。
+ * 按钮的经过状态。常量值。
  */
 Button.OVER = "over";
 /**
- * 按钮的按下状态。常数。
+ * 按钮的按下状态。常量值。
  */
 Button.DOWN = "down";
 /**
- * 按钮的不可用状态。常数。
+ * 按钮的不可用状态。常量值。
  */
 Button.DISABLED = "disabled";
 
 /**
  * 设置按钮弹起状态的显示帧。
+ * @param {Array} upState 弹起状态的显示帧。
+ * @return {Button} 返回按钮本身。
  */
 Button.prototype.setUpState = function(upState)
 {
@@ -3434,6 +3537,8 @@ Button.prototype.setUpState = function(upState)
 
 /**
  * 设置按钮经过状态的显示帧。
+ * @param {Array} overState 经过状态的显示帧。
+ * @return {Button} 返回按钮本身。
  */
 Button.prototype.setOverState = function(overState)
 {
@@ -3445,6 +3550,8 @@ Button.prototype.setOverState = function(overState)
 
 /**
  * 设置按钮按下状态的显示帧。
+ * @param {Array} downState 点击状态的显示帧。
+ * @return {Button} 返回按钮本身。
  */
 Button.prototype.setDownState = function(downState)
 {
@@ -3456,6 +3563,8 @@ Button.prototype.setDownState = function(downState)
 
 /**
  * 设置按钮不可用状态的显示帧。
+ * @param {Array} disabledState 不可用状态的显示帧。
+ * @return {Button} 返回按钮本身。
  */
 Button.prototype.setDisabledState = function(disabledState)
 {
@@ -3467,11 +3576,13 @@ Button.prototype.setDisabledState = function(disabledState)
 
 /**
  * 设置按钮是否启用。
+ * @param {Boolean} enabled 指定按钮是否启用。默认为false。
+ * @return {Button} 返回按钮本身。
  */
 Button.prototype.setEnabled = function(enabled)
 {
 	if(this.enabled == enabled) return this;
-	this.eventEnabled = this.enabled = enabled;
+	this.eventEnabled = this.enabled = enabled;	 
 	if(!enabled)
 	{
 		if(this.disabledState) this._skin.gotoAndStop(Button.DISABLED);
@@ -3484,7 +3595,9 @@ Button.prototype.setEnabled = function(enabled)
 };
 
 /**
- * 改变按钮的状态。
+ * 改变按钮的显示状态。
+ * @param {String} state 指定按钮的显示状态。
+ * @return {Button} 返回按钮本身。
  */
 Button.prototype.changeState = function(state)
 {
@@ -3513,11 +3626,11 @@ Button.prototype.changeState = function(state)
 Button.prototype.dispatchEvent = function(e)
 {
 	if(!this.enabled) return;
-
+	
 	switch(e.type)
 	{
 		case "mousemove":
-			if(this.overState) this.changeState(Button.OVER);
+			if(this.overState) this.changeState(Button.OVER);		
 			break;
 		case "mousedown":
 		case "touchstart":
@@ -3553,40 +3666,40 @@ Button.prototype.setDrawable = function(drawable)
 (function(){
 
 /**
- * Constructor.
+ * 构造函数.
  * @name Graphics
  * @augments DisplayObject
- * @class The Graphics class contains a set of methods that you can use to create a vector shape.
- */
+ * @class Graphics类包含一组创建矢量图形的方法。
+ */ 
 var Graphics = Quark.Graphics = function(props)
-{
+{	
 	this.lineWidth = 1;
 	this.strokeStyle = "0";
 	this.lineAlpha = 1;
 	this.lineCap = null; //"butt", "round", "square"
 	this.lineJoin = null; //"miter", "round", "bevel"
 	this.miterLimit = 10;
-
+	
 	this.hasStroke = false;
 	this.hasFill = false;
-
+	
 	this.fillStyle = "0";
 	this.fillAlpha = 1;
-
+	
 	props = props || {};
 	Graphics.superClass.constructor.call(this, props);
 	this.id = Quark.UIDUtil.createUID("Graphics");
-
+	
 	this._actions = [];
 	this._cache = null;
 };
 Quark.inherit(Graphics, Quark.DisplayObject);
 
 /**
- * Specifies a line style that Canvas uses for subsequent calls to other Graphics methods (such as lineTo() or drawCircle()) for the object.
+ * 指定绘制图形的线条样式。
  */
 Graphics.prototype.lineStyle = function(thickness, lineColor, alpha, lineCap, lineJoin, miterLimit)
-{
+{	
 	this._addAction(["lineWidth", (this.lineWidth = thickness || 1)]);
 	this._addAction(["strokeStyle", (this.strokeStyle = lineColor || "0")]);
 	this._addAction(["lineAlpha", (this.lineAlpha = alpha || 1)]);
@@ -3598,7 +3711,7 @@ Graphics.prototype.lineStyle = function(thickness, lineColor, alpha, lineCap, li
 };
 
 /**
- * Specifies an available fill that subsequent calls to other Graphics methods (such as lineTo() or drawCircle()) use when drawing.
+ * 指定绘制图形的填充样式和透明度。
  */
 Graphics.prototype.beginFill = function(fill, alpha)
 {
@@ -3609,7 +3722,7 @@ Graphics.prototype.beginFill = function(fill, alpha)
 };
 
 /**
- * Applies a fill to the lines and curves that were added.
+ * 应用并结束笔画的绘制和图形样式的填充。
  */
 Graphics.prototype.endFill = function()
 {
@@ -3619,7 +3732,7 @@ Graphics.prototype.endFill = function()
 };
 
 /**
- * Specifies a linear gradient fill that subsequent calls to other Graphics methods (such as lineTo() or drawCircle()) use when drawing.
+ * 指定绘制图形的线性渐变填充样式。
  */
 Graphics.prototype.beginLinearGradientFill = function(x0, y0, x1, y1, colors, ratios)
 {
@@ -3632,7 +3745,7 @@ Graphics.prototype.beginLinearGradientFill = function(x0, y0, x1, y1, colors, ra
 };
 
 /**
- * Specifies a radial gradient fill that subsequent calls to other Graphics methods (such as lineTo() or drawCircle()) use when drawing.
+ * 指定绘制图形的放射性渐变填充样式。
  */
 Graphics.prototype.beginRadialGradientFill = function(x0, y0, r0, x1, y1, r1, colors, ratios)
 {
@@ -3640,13 +3753,14 @@ Graphics.prototype.beginRadialGradientFill = function(x0, y0, r0, x1, y1, r1, co
 	for (var i = 0, len = colors.length; i < len; i++)
 	{
 		gradient.addColorStop(ratios[i], colors[i]);
-	}
+	}	
 	return this._addAction(["fillStyle", (this.fillStyle = gradient)]);
 };
 
 /**
- * Fills a drawing area with a bitmap image.
- * The repetition parameter must be one of the following values: repeat, repeat-x, repeat-y, no-repeat.
+ * 开始一个位图填充样式。
+ * @param {HTMLImageElement} image 指定填充的Image对象。
+ * @param {String} repetition 指定填充的重复设置参数。它可以是以下任意一个值：repeat, repeat-x, repeat-y, no-repeat。默认为""。
  */
 Graphics.prototype.beginBitmapFill = function(image, repetition)
 {
@@ -3655,7 +3769,7 @@ Graphics.prototype.beginBitmapFill = function(image, repetition)
 };
 
 /**
- * Begins a path.
+ * 开始一个新的路径。
  */
 Graphics.prototype.beginPath = function()
 {
@@ -3663,7 +3777,7 @@ Graphics.prototype.beginPath = function()
 };
 
 /**
- * Closes a path.
+ * 关闭当前的路径。
  */
 Graphics.prototype.closePath = function()
 {
@@ -3671,7 +3785,7 @@ Graphics.prototype.closePath = function()
 };
 
 /**
- * Draws a rectangle.
+ * 绘制一个矩形。
  */
 Graphics.prototype.drawRect = function(x, y, width, height)
 {
@@ -3679,7 +3793,7 @@ Graphics.prototype.drawRect = function(x, y, width, height)
 };
 
 /**
- * Draws a complex rounded rectangle.
+ * 绘制一个复杂的圆角矩形。
  */
 Graphics.prototype.drawRoundRectComplex = function(x, y, width, height, cornerTL, cornerTR, cornerBR, cornerBL)
 {
@@ -3696,7 +3810,7 @@ Graphics.prototype.drawRoundRectComplex = function(x, y, width, height, cornerTL
 };
 
 /**
- * Draws a rounded rectangle.
+ * 绘制一个圆角矩形。
  */
 Graphics.prototype.drawRoundRect = function(x, y, width, height, cornerSize)
 {
@@ -3704,7 +3818,7 @@ Graphics.prototype.drawRoundRect = function(x, y, width, height, cornerSize)
 };
 
 /**
- * Draws a circle.
+ * 绘制一个圆。
  */
 Graphics.prototype.drawCircle = function(x, y, radius)
 {
@@ -3712,16 +3826,16 @@ Graphics.prototype.drawCircle = function(x, y, radius)
 };
 
 /**
- * Draws a ellipse.
+ * 绘制一个椭圆。
  */
 Graphics.prototype.drawEllipse = function(x, y, width, height)
 {
 	if(width == height) return this.drawCircle(x, y, width);
-
+	
 	var w = width / 2, h = height / 2, C = 0.5522847498307933, cx = C * w, cy = C * h;
 	x = x + w;
 	y = y + h;
-
+	
 	this._addAction(["moveTo", x + w, y]);
 	this._addAction(["bezierCurveTo", x + w, y - cy, x + cx, y - h, x, y - h]);
 	this._addAction(["bezierCurveTo", x - cx, y - h, x - w, y - cy, x - w, y]);
@@ -3731,16 +3845,16 @@ Graphics.prototype.drawEllipse = function(x, y, width, height)
 };
 
 /**
- * Draws a path from SVG path data.
- * For example:
- * var path = "M250 150 L150 350 L350 350 Z";
- * var shape = new Quark.Graphics({width:500, height:500});
- * shape.drawSVGPath(path).beginFill("#0ff").endFill();
+ * 根据参数指定的SVG数据绘制一条路径。
+ * 代码示例: 
+ * <p>var path = "M250 150 L150 350 L350 350 Z";</p>
+ * <p>var shape = new Quark.Graphics({width:500, height:500});</p>
+ * <p>shape.drawSVGPath(path).beginFill("#0ff").endFill();</p>
  */
 Graphics.prototype.drawSVGPath = function(pathData)
 {
 	var path = pathData.split(/,| (?=[a-zA-Z])/);
-
+	
 	this._addAction(["beginPath"]);
 	for(var i = 0, len = path.length; i < len; i++)
 	{
@@ -3769,18 +3883,18 @@ Graphics.prototype.drawSVGPath = function(pathData)
 };
 
 /**
- * Performs all drawing actions. For internal use.
+ * 执行全部绘制动作。内部私有方法。
  * @private
  */
 Graphics.prototype._draw = function(context)
-{
+{	
 	context.beginPath();
 	for(var i = 0, len = this._actions.length; i < len; i++)
 	{
-		var action = this._actions[i],
-			f = action[0],
+		var action = this._actions[i], 
+			f = action[0], 
 			args = action.length > 1 ? action.slice(1) : null;
-
+		
 		if(typeof(context[f]) == "function") context[f].apply(context, args);
 		else context[f] = action[1];
 	}
@@ -3798,20 +3912,20 @@ Graphics.prototype.getDrawable = function(context)
 };
 
 /**
- * Caches the graphics to a canvas or image. Increase the performance normally.
+ * 缓存graphics到一个canvas或image。可用来提高渲染效率。
  */
 Graphics.prototype.cache = function(toImage)
 {
 	var canvas = Quark.createDOM("canvas", {width:this.width, height:this.height});
 	this._draw(canvas.getContext("2d"));
-
+	
 	this._cache = canvas;
 	if(toImage) this._cache = this.toImage();
 	return this._cache;
 };
 
 /**
- * Releases the cache.
+ * 清除缓存。
  */
 Graphics.prototype.uncache = function()
 {
@@ -3819,13 +3933,14 @@ Graphics.prototype.uncache = function()
 };
 
 /**
- * Converts the graphics to a dataURL image.
+ * 把Graphics对象转换成dataURL格式的位图。
+ * @param {String} type 指定转换为DataURL格式的图片mime类型。默认为"image/png"。
  */
 Graphics.prototype.toImage = function(type)
 {
 	var cache = this._cache || this.cache(true);
 	if(cache instanceof HTMLImageElement) return cache;
-
+	
 	var img = new Image();
 	img.src = cache.toDataURL(type || "image/png");
 	img.width = this.width;
@@ -3834,13 +3949,13 @@ Graphics.prototype.toImage = function(type)
 };
 
 /**
- * Clears all drawing actions and cached image.
+ * 清除所有绘制动作并复原所有初始状态。
  */
 Graphics.prototype.clear = function()
 {
 	this._actions.length = 0;
 	this._cache = null;
-
+	
 	this.lineWidth = 1;
 	this.strokeStyle = "0";
 	this.lineAlpha = 1;
@@ -3848,13 +3963,13 @@ Graphics.prototype.clear = function()
 	this.lineJoin = null;
 	this.miterLimit = 10;
 	this.hasStroke = false;
-
+	
 	this.fillStyle = "0";
 	this.fillAlpha = 1;
 };
 
-/**
- * Adds a drawing action. For internal use.
+/** 
+ * 添加一个绘制动作。内部私有方法。
  * @private
  */
 Graphics.prototype._addAction = function(action)
@@ -3875,7 +3990,7 @@ Graphics._getContext = function()
 	};
 	return ctx;
 };
-
+	
 })();
 
 
@@ -3883,19 +3998,19 @@ Graphics._getContext = function()
 (function(){
 
 /**
- * Constructor.
+ * 构造函数。
  * @name Text
  * @augments DisplayObject
- * @class The Text class provides simple text drawing.
- * @property text The text to display.
- * @property font  The font style to use.
- * @property color The color to use.
- * @property textAlign The text alignment. Can be any of "start", "end", "left", "right", and "center".
- * @property outline Determine whether stroke or fill text.
- * @property maxWidth The maximum width to draw the text, For canvas use.
- * @property lineWidth The maximum width for a line of text.
- * @property lineSpacing The space between two lines, in pixel.
- * @property fontMetrics The font metrics. You don't need to care it in most cases, can be passed in for performance optimization.
+ * @class Text类提供简单的文字显示功能。
+ * @property text 指定要显示的文本内容。
+ * @property font 指定使用的字体样式。
+ * @property color 指定使用的字体颜色。
+ * @property textAlign 指定文本的对齐方式。可以是以下任意一个值："start", "end", "left", "right", and "center"。
+ * @property outline 指定文本是绘制边框还是填充。
+ * @property maxWidth 指定文本绘制的最大宽度。仅在canvas中使用。
+ * @property lineWidth 指定文本行的最大宽度。
+ * @property lineSpacing 指定文本的行距。单位为像素。
+ * @property fontMetrics 指定字体的度量对象。一般可忽略此属性，可用于提高性能。
  */
 var Text = Quark.Text = function(props)
 {
@@ -3919,7 +4034,7 @@ Quark.inherit(Text, Quark.DisplayObject);
 
 
 /**
- * Draws the text into the specific context.
+ * 在指定的渲染上下文上绘制文本。
  * @private
  */
 Text.prototype._draw = function(context)
@@ -3980,7 +4095,7 @@ Text.prototype._draw = function(context)
 };
 
 /**
- * Draws a text line into the specific context.
+ * 在指定的渲染上下文上绘制一行文本。
  * @private
  */
 Text.prototype._drawTextLine = function(context, text, y)
@@ -3998,11 +4113,10 @@ Text.prototype._drawTextLine = function(context, text, y)
 	};
 	if(this.outline) context.strokeText(text, x, y, this.maxWidth);
 	else context.fillText(text, x, y, this.maxWidth);
-	// console.log(this.textAlign,x,y);
 };
 
 /**
- * Indicates the font style to use.
+ * 指定渲染文本的字体样式。
  */
 Text.prototype.setFont = function(font, ignoreFontMetrics)
 {
@@ -4044,9 +4158,9 @@ Text.prototype.getDrawable = function(context)
 };
 
 /**
- * A help method that returns line height and baseline informations of the specific font.
+ * 此方法可帮助我们得到指定字体的行高、基准线等度量信息。
  * @method getFontMetrics
- * @return {Object} a font metrics object with height, ascent, descent.
+ * @return {Object} 返回字体的度量信息，包括height、ascent、descent等。
  */
 Text.getFontMetrics = function(font)
 {
@@ -4063,7 +4177,7 @@ Text.getFontMetrics = function(font)
 	metrics.ascent = baseline.offsetTop + baseline.offsetHeight;
 	//the descent value is the length from the baseline to the bottom of the line height.
 	metrics.descent = metrics.height - metrics.ascent;
-
+	
 	document.body.removeChild(elem);
 	return metrics;
 };
